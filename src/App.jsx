@@ -19,7 +19,7 @@ const FoodDetail = lazy(() => import('./components/FoodDetail'));
 const MemeReward = lazy(() => import('./components/MemeReward'));
 
 function App() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [currentMeme, setCurrentMeme] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
@@ -47,6 +47,13 @@ function App() {
       .sortBy('timestamp'),
     [selectedDate]
   ) || [];
+
+  // Sync language from store to i18n
+  useEffect(() => {
+    if (language && i18n.language !== language) {
+      i18n.changeLanguage(language);
+    }
+  }, [language, i18n]);
 
   useEffect(() => {
     // Initialize Gemini if API key exists or fallback to env var

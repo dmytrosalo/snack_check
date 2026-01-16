@@ -53,7 +53,7 @@ export const useAppStore = create(
       setSelectedDate: (date) => set({ selectedDate: date }),
     }),
     {
-      name: 'calories-tracker-storage',
+      name: 'calories-tracker-storage-v1',
       partialize: (state) => ({
         language: state.language,
         apiKey: state.apiKey,

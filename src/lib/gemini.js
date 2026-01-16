@@ -83,7 +83,7 @@ export const analyzeFoodFromImage = async (base64Image, language = 'ua') => {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     // Remove header from base64 string if present
     const cleanBase64 = base64Image.split(',')[1] || base64Image;
@@ -112,7 +112,7 @@ export const analyzeFoodFromText = async (description, language = 'ua') => {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
     const result = await model.generateContent([
       getSystemPrompt(language),
