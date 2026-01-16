@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import { Trash2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Trash2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from './stores/appStore';
@@ -199,7 +199,7 @@ function App() {
               onClick={() => setShowSettings(true)}
               className="p-2 bg-slate-800/50 rounded-full hover:bg-slate-700/50 transition-colors"
             >
-              <RefreshCw size={20} className="text-slate-400" />
+              <SettingsIcon size={22} className="text-slate-400" />
             </button>
           </div>
         </div>
