@@ -4,6 +4,7 @@ import { useAppStore } from '../stores/appStore';
 import { analyzeFoodFromText, analyzeFoodFromImage, isGeminiInitialized } from '../lib/gemini';
 import { addFoodEntry } from '../lib/db';
 import { resizeImage } from '../lib/imageUtils';
+import { useTranslation } from 'react-i18next'; // Import i18n
 
 export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
   const [input, setInput] = useState('');
@@ -12,11 +13,24 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
   const [analysisResult, setAnalysisResult] = useState(null);
   const fileInputRef = useRef(null);
 
-  const { setError, setShowSettings, apiKey } = useAppStore();
+  const { setError, setShowSettings, apiKey, language } = useAppStore(); // Get language
+  const { t } = useTranslation(); // Init hook
 
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError(t('errors.invalidFileType'));
+      return;
+    }
+
+    // Validate file size (e.g., max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError(t('errors.fileTooLarge'));
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -53,14 +67,14 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
     // Check limit if using default key
     if (!apiKey) {
       if (!isGeminiInitialized()) {
-        setError('Please add your Gemini API key in settings');
+        setError(t('errors.noApiKey')); // Replaced text
         setShowSettings(true);
         return;
       }
 
       const { requestCount } = useAppStore.getState();
       if (requestCount >= 30) {
-        setError('Free limit reached (30 requests). Please add your own API key in settings.');
+        setError(t('errors.limitReached')); // Replaced text
         setShowSettings(true);
         return;
       }
@@ -76,7 +90,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
       if (previewImage) {
         result = await analyzeFoodFromImage(previewImage);
       } else {
-        result = await analyzeFoodFromText(input);
+        result = await analyzeFoodFromText(input, language); // Pass language
       }
       setAnalysisResult(result);
 
@@ -108,7 +122,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
       // Trigger meme reward
       if (onSuccess) onSuccess(entry);
     } catch (err) {
-      setError('Failed to save entry');
+      setError(t('errors.failedToSave')); // Replaced text
     }
   };
 
@@ -153,34 +167,34 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
                 ? 'bg-yellow-500/20 text-yellow-400'
                 : 'bg-red-500/20 text-red-400'
               }`}>
-              {analysisResult.confidence} confidence
+              {analysisResult.confidence} {t('confidence')} {/* Replaced text */}
             </span>
           </div>
           <div className="grid grid-cols-4 gap-2 text-center text-sm">
             <div>
               <div className="text-white font-bold">{analysisResult.calories}</div>
-              <div className="text-slate-400 text-xs">kcal</div>
+              <div className="text-slate-400 text-xs">{t('detail.calories')}</div> {/* Replaced text */}
             </div>
             <div>
               <div className="text-blue-400 font-bold">{analysisResult.protein}g</div>
-              <div className="text-slate-400 text-xs">protein</div>
+              <div className="text-slate-400 text-xs">{t('detail.protein')}</div> {/* Replaced text */}
             </div>
             <div>
               <div className="text-amber-400 font-bold">{analysisResult.carbs}g</div>
-              <div className="text-slate-400 text-xs">carbs</div>
+              <div className="text-slate-400 text-xs">{t('detail.carbs')}</div> {/* Replaced text */}
             </div>
             <div>
               <div className="text-pink-400 font-bold">{analysisResult.fat}g</div>
-              <div className="text-slate-400 text-xs">fat</div>
+              <div className="text-slate-400 text-xs">{t('detail.fat')}</div> {/* Replaced text */}
             </div>
           </div>
-          <p className="text-slate-400 text-xs mt-2">Portion: {analysisResult.portion}</p>
+          <p className="text-slate-400 text-xs mt-2">{t('detail.portion')}: {analysisResult.portion}</p> {/* Replaced text */}
 
           <button
             onClick={handleAddEntry}
             className="w-full mt-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors"
           >
-            Add to Log
+            {t('input.add')} {/* Replaced text */}
           </button>
         </div>
       )}
@@ -193,7 +207,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={previewImage ? "Add description (optional)..." : "Describe your food..."}
+            placeholder={previewImage ? t('input.descriptionOptional') : t('input.placeholder')} // Replaced text
             className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600/50 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500/50 transition-colors"
             disabled={isAnalyzing}
           />
@@ -211,7 +225,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
           onClick={() => fileInputRef.current?.click()}
           disabled={isAnalyzing}
           className="p-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 rounded-xl transition-colors disabled:opacity-50"
-          aria-label="Upload Image"
+          aria-label={t('input.uploadImage')} // Replaced text
         >
           <Image size={22} />
         </button>
@@ -221,7 +235,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
           onClick={onShowCamera}
           disabled={isAnalyzing}
           className="p-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 rounded-xl transition-colors disabled:opacity-50"
-          aria-label="Camera"
+          aria-label={t('input.camera')} // Replaced text
         >
           <Camera size={22} />
         </button>
@@ -231,7 +245,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
           onClick={analysisResult ? handleAddEntry : handleAnalyze}
           disabled={isAnalyzing || (!input.trim() && !previewImage && !analysisResult)}
           className="p-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label={analysisResult ? "Add Entry" : "Send"}
+          aria-label={analysisResult ? t('input.add') : t('input.send')} // Replaced text
         >
           {isAnalyzing ? (
             <Loader2 size={22} className="animate-spin" />

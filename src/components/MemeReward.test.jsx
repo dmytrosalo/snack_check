@@ -33,7 +33,7 @@ describe('MemeReward', () => {
     it('renders meme image and title', () => {
         render(<MemeReward meme={mockMeme} onClose={() => { }} />);
 
-        expect(screen.getByText('Meal Logged!')).toBeInTheDocument();
+        expect(screen.getByText('meme.title')).toBeInTheDocument();
         expect(screen.getByAltText('Funny Meme')).toBeInTheDocument();
         expect(screen.getByText('Funny Meme')).toBeInTheDocument();
     });
@@ -42,7 +42,7 @@ describe('MemeReward', () => {
         const handleClose = vi.fn();
         render(<MemeReward meme={mockMeme} onClose={handleClose} />);
 
-        const button = screen.getByText('Awesome!');
+        const button = screen.getByText('meme.awesome');
         fireEvent.click(button);
 
         expect(handleClose).toHaveBeenCalled();

@@ -37,7 +37,7 @@ describe('FoodDetail', () => {
         // New features
         expect(screen.getByText('High Protein')).toBeInTheDocument();
         expect(screen.getByText('Cheat Meal')).toBeInTheDocument();
-        expect(screen.getByText(/PlateMate Says/i)).toBeInTheDocument();
+        expect(screen.getByText(/detail.insightTitle/i)).toBeInTheDocument();
         expect(screen.getByText('Enjoy the gains, buddy!')).toBeInTheDocument();
     });
 
@@ -45,7 +45,7 @@ describe('FoodDetail', () => {
         const handleClose = vi.fn();
         render(<FoodDetail entry={mockEntry} onClose={handleClose} />);
 
-        const okButton = screen.getByRole('button', { name: /ok/i });
+        const okButton = screen.getByRole('button', { name: /detail.ok/i });
         fireEvent.click(okButton);
 
         expect(handleClose).toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('FoodDetail', () => {
 
         render(<FoodDetail entry={mockEntry} onClose={handleClose} />);
 
-        // Helper to find the Delete button by aria-label since it has no text
+        // Helper to find the Delete button by aria-label since it has no text or explicitly labeled
         const deleteBtn = screen.getByRole('button', { name: /delete entry/i });
         fireEvent.click(deleteBtn);
 

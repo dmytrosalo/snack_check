@@ -4,6 +4,10 @@ import { persist } from 'zustand/middleware';
 export const useAppStore = create(
   persist(
     (set, get) => ({
+      // Localization
+      language: 'ua',
+      setLanguage: (lang) => set({ language: lang }),
+
       // API Key
       apiKey: '',
       setApiKey: (key) => set({ apiKey: key }),
@@ -51,6 +55,7 @@ export const useAppStore = create(
     {
       name: 'calories-tracker-storage',
       partialize: (state) => ({
+        language: state.language,
         apiKey: state.apiKey,
         dailyGoals: state.dailyGoals,
         requestCount: state.requestCount,

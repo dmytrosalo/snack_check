@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.0.10] - 2026-01-16
+### Localization 🇺🇦 / 🇺🇸
+- **Multi-Language Support**: Added full support for **Ukrainian (UA)** and **English (EN)**.
+- **Default Language**: Set Ukrainian as the default language for new users.
+- **Language Toggle**: Added a language switcher in the `Settings` menu.
+- **Localized AI**: Updates the AI prompt to respond in the selected language, maintaining its personality (including culturally relevant sass in Ukrainian).
+- **UI Translation**: Translated all application text, including buttons, placeholders, and error messages.
+- **Image Validation**: Restored checks for file type and size (limit 10MB) to ensure platform stability.
+
 ## [0.0.9] - 2026-01-16
 ### User Interface Fixes
 - **Detail View**: Fixed "Invalid Date" display bug by handling legacy and new timestamp formats correctly.

@@ -1,17 +1,19 @@
 import { X, Trash2, Clock, Flame, Info } from 'lucide-react';
 import { deleteFoodEntry } from '../lib/db';
 import { useAppStore } from '../stores/appStore';
+import { useTranslation } from 'react-i18next'; // Import i18n
 
 export default function FoodDetail({ entry, onClose }) {
     const { setError } = useAppStore();
+    const { t } = useTranslation(); // Init hook
 
     const handleDelete = async () => {
-        if (window.confirm('Are you sure you want to delete this entry?')) {
+        if (window.confirm(t('detail.confirmDelete'))) {
             try {
                 await deleteFoodEntry(entry.id);
                 onClose();
             } catch (err) {
-                setError('Failed to delete entry');
+                setError(t('errors.failedToDelete'));
             }
         }
     };
@@ -88,7 +90,7 @@ export default function FoodDetail({ entry, onClose }) {
                     <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
                         <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
                             <Flame size={16} className="text-orange-500" />
-                            <span>Calories</span>
+                            <span>{t('detail.calories')}</span>
                         </div>
                         <div className="text-2xl font-bold text-white">
                             {entry.calories} <span className="text-sm font-normal text-slate-500">kcal</span>
@@ -97,15 +99,15 @@ export default function FoodDetail({ entry, onClose }) {
 
                     <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 space-y-3">
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-blue-400 font-medium">Protein</span>
+                            <span className="text-blue-400 font-medium">{t('detail.protein')}</span>
                             <span className="text-white font-bold">{entry.protein}g</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-amber-400 font-medium">Carbs</span>
+                            <span className="text-amber-400 font-medium">{t('detail.carbs')}</span>
                             <span className="text-white font-bold">{entry.carbs}g</span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-pink-400 font-medium">Fat</span>
+                            <span className="text-pink-400 font-medium">{t('detail.fat')}</span>
                             <span className="text-white font-bold">{entry.fat}g</span>
                         </div>
                     </div>
@@ -115,7 +117,7 @@ export default function FoodDetail({ entry, onClose }) {
                 <div className="space-y-4 mb-8">
                     {entry.healthTip && (
                         <div className="bg-indigo-500/10 p-4 rounded-xl border border-indigo-500/20">
-                            <h4 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">PlateMate Says 🤖</h4>
+                            <h4 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">{t('detail.insightTitle')}</h4>
                             <p className="text-slate-200 text-sm">{entry.healthTip}</p>
                         </div>
                     )}
@@ -125,7 +127,7 @@ export default function FoodDetail({ entry, onClose }) {
                             <Info size={18} className="text-slate-400 mt-0.5" />
                             <div>
                                 <p className="text-slate-300 text-sm leading-relaxed">
-                                    <span className="text-slate-500 block text-xs uppercase tracking-wider mb-1">Portion Estimate</span>
+                                    <span className="text-slate-500 block text-xs uppercase tracking-wider mb-1">{t('detail.portion')}</span>
                                     {entry.portion || 'No portion information available.'}
                                 </p>
                             </div>
@@ -139,7 +141,7 @@ export default function FoodDetail({ entry, onClose }) {
                         onClick={onClose}
                         className="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-emerald-500/20"
                     >
-                        OK
+                        {t('detail.ok')}
                     </button>
                     <button
                         onClick={handleDelete}

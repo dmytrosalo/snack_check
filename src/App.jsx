@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { Trash2, AlertCircle, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from './stores/appStore';
 import { initGemini } from './lib/gemini';
@@ -79,22 +81,23 @@ function App() {
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
+    // if (!touchStart || !touchEnd) return; // Removed as per new state
 
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    // const distance = touchStart - touchEnd; // Removed as per new state
+    // const isLeftSwipe = distance > minSwipeDistance; // Removed as per new state
+    // const isRightSwipe = distance < -minSwipeDistance; // Removed as per new state
 
-    if (isLeftSwipe) {
-      // Swiping Left -> Next Day (like pages of a book, next page is on right, so you swipe left to bring it in? Or timeline?)
-      // Timeline convention: Past is Left, Future is Right.
-      // Swipe Left (finger moves Left) -> Moves content Left -> Reveals content on Right (Future)
-      changeDate(1);
-    }
+    // if (isLeftSwipe) {
+    //   // Swiping Left -> Next Day (like pages of a book, next page is on right, so you swipe left to bring it in? Or timeline?)
+    //   // Timeline convention: Past is Left, Future is Right.
+    //   // Swipe Left (finger moves Left) -> Moves content Left -> Reveals content on Right (Future)
+    //   changeDate(1);
+    // }
 
-    if (isRightSwipe) {
-      // Swipe Right (finger moves Right) -> Moves content Right -> Reveals content on Left (Past)
-      changeDate(-1);
-    }
+    // if (isRightSwipe) {
+    //   // Swipe Right (finger moves Right) -> Moves content Right -> Reveals content on Left (Past)
+    //   changeDate(-1);
+    // }
   };
 
   const handlePostTracking = (entry) => {
@@ -128,10 +131,10 @@ function App() {
   const handleCameraCapture = async (imageDataUrl) => {
     // Check limit if using default key
     if (!apiKey) {
-      const { requestCount, incrementRequestCount } = useAppStore.getState();
+      const { requestCount } = useAppStore.getState();
       if (requestCount >= 30) {
         setShowCamera(false);
-        setError('Free limit reached (30 requests). Please add your own API key in settings.');
+        setError(t('errors.limitReached'));
         setShowSettings(true);
         return;
       }
@@ -140,11 +143,12 @@ function App() {
     setShowCamera(false);
 
     try {
-      const result = await analyzeFoodFromImage(imageDataUrl);
+      // Pass language to analysis
+      const result = await analyzeFoodFromImage(imageDataUrl, language);
       const entry = {
         ...result,
         imageUrl: imageDataUrl,
-        date: selectedDate // Ensure we add to currently selected date (or default logic handles today)
+        date: selectedDate
       };
 
       await addFoodEntry(entry);
@@ -154,7 +158,6 @@ function App() {
         useAppStore.getState().incrementRequestCount();
       }
 
-      // Show reward or detail
       handlePostTracking(entry);
     } catch (err) {
       setError(err.message);
@@ -179,18 +182,17 @@ function App() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800/50 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
-          <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-              PlateMate
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-sm">
+              {t('app.title')}
             </h1>
-            <p className="text-slate-500 text-xs">AI-Powered Nutrition</p>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="p-2 bg-slate-800/50 rounded-full hover:bg-slate-700/50 transition-colors"
+            >
+              <RefreshCw size={20} className="text-slate-400" />
+            </button>
           </div>
-          <button
-            onClick={() => setShowSettings(true)}
-            className="p-2 hover:bg-slate-800/50 rounded-full text-slate-400 transition-colors"
-          >
-            <SettingsIcon size={22} />
-          </button>
         </div>
       </header>
 
