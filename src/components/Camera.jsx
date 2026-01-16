@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Camera as CameraIcon, RotateCcw, Check } from 'lucide-react';
 import { resizeImage } from '../lib/imageUtils';
 
 export default function Camera({ onCapture, onClose }) {
+  const { t } = useTranslation();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [stream, setStream] = useState(null);
@@ -39,7 +41,7 @@ export default function Camera({ onCapture, onClose }) {
       setError(null);
     } catch (err) {
       console.error('Camera error:', err);
-      setError('Could not access camera. Please grant permission.');
+      setError(t('camera.error'));
     }
   };
 
@@ -101,7 +103,7 @@ export default function Camera({ onCapture, onClose }) {
         >
           <X size={24} />
         </button>
-        <span className="text-white font-medium">Take Photo</span>
+        <span className="text-white font-medium">{t('camera.title')}</span>
         <button
           onClick={toggleCamera}
           className="p-2 rounded-full bg-white/10 text-white"
@@ -120,7 +122,7 @@ export default function Camera({ onCapture, onClose }) {
                 onClick={startCamera}
                 className="px-4 py-2 bg-emerald-500 rounded-lg"
               >
-                Try Again
+                {t('camera.tryAgain')}
               </button>
             </div>
           </div>

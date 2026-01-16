@@ -3,6 +3,19 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import FoodLog from './FoodLog';
 
 // Mock dependencies
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => {
+            const map = {
+                'log.emptyTitle': 'No food logged yet',
+                'detail.confirmDelete': 'Are you sure you want to delete this entry?',
+                'errors.failedToDelete': 'Failed to delete entry'
+            };
+            return map[key] || key;
+        },
+    }),
+}));
+
 vi.mock('../lib/db', () => ({
     deleteFoodEntry: vi.fn(),
 }));

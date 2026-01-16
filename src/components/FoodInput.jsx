@@ -88,7 +88,8 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
     try {
       let result;
       if (previewImage) {
-        result = await analyzeFoodFromImage(previewImage);
+        // Pass input as additional context
+        result = await analyzeFoodFromImage(previewImage, language, input);
       } else {
         result = await analyzeFoodFromText(input, language); // Pass language
       }

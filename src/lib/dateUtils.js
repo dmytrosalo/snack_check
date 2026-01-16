@@ -2,7 +2,7 @@
  * Format a date string (YYYY-MM-DD) to a human readable format
  * e.g. "Today", "Yesterday", "Mon, Jan 01"
  */
-export const formatDate = (dateString) => {
+export const formatDate = (dateString, locale = 'uk-UA') => {
     const date = new Date(dateString);
     const today = new Date();
     const yesterday = new Date(today);
@@ -13,10 +13,13 @@ export const formatDate = (dateString) => {
     const t = new Date().setHours(0, 0, 0, 0);
     const y = new Date(yesterday).setHours(0, 0, 0, 0);
 
-    if (d === t) return 'Today';
-    if (d === y) return 'Yesterday';
+    // TODO: Ideally translate "Today"/"Yesterday" too, checking if locale is uk
+    const isUa = locale.startsWith('uk') || locale === 'ua';
 
-    return date.toLocaleDateString('en-US', {
+    if (d === t) return isUa ? 'Сьогодні' : 'Today';
+    if (d === y) return isUa ? 'Вчора' : 'Yesterday';
+
+    return date.toLocaleDateString(isUa ? 'uk-UA' : 'en-US', {
         weekday: 'short',
         month: 'short',
         day: 'numeric'

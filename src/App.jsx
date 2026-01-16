@@ -227,7 +227,7 @@ function App() {
         </button>
         <div className="flex items-center gap-2 font-medium">
           <Calendar size={16} className="text-emerald-400" />
-          <span>{formatDate(selectedDate)}</span>
+          <span>{formatDate(selectedDate, language)}</span>
         </div>
         <button
           onClick={() => changeDate(1)}
@@ -247,7 +247,7 @@ function App() {
             className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 cursor-pointer hover:bg-amber-500/20 transition-colors"
           >
             <p className="text-amber-400 text-sm">
-              👋 Welcome! Tap here to add your Gemini API key and start tracking.
+              {t('app.welcome')}
             </p>
           </div>
         )}

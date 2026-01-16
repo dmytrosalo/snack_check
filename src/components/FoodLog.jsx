@@ -1,17 +1,19 @@
 import { Trash2, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { deleteFoodEntry } from '../lib/db';
 import { useAppStore } from '../stores/appStore';
 
 export default function FoodLog({ entries, onItemClick }) {
+  const { t } = useTranslation();
   const { setError } = useAppStore();
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
-    if (window.confirm('Are you sure you want to delete this entry?')) {
+    if (window.confirm(t('detail.confirmDelete'))) {
       try {
         await deleteFoodEntry(id);
       } catch (err) {
-        setError('Failed to delete entry');
+        setError(t('errors.failedToDelete'));
       }
     }
   };
@@ -27,9 +29,9 @@ export default function FoodLog({ entries, onItemClick }) {
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">🍽️</div>
-        <h3 className="text-slate-300 font-medium mb-2">No food logged yet</h3>
+        <h3 className="text-slate-300 font-medium mb-2">{t('log.emptyTitle')}</h3>
         <p className="text-slate-500 text-sm">
-          Add your first meal using text or photo
+          {t('log.emptySubtitle')}
         </p>
       </div>
     );
@@ -38,7 +40,7 @@ export default function FoodLog({ entries, onItemClick }) {
   return (
     <div className="space-y-3">
       <h3 className="text-slate-400 text-sm font-medium mb-3">
-        Today's Log ({entries.length} items)
+        {t('log.todayTitle')} ({entries.length})
       </h3>
 
       {entries.map((entry, index) => (

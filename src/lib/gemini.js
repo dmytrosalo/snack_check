@@ -77,19 +77,25 @@ const parseResponse = (text) => {
   };
 };
 
-export const analyzeFoodFromImage = async (base64Image, language = 'ua') => {
+export const analyzeFoodFromImage = async (base64Image, language = 'ua', additionalContext = '') => {
   if (!genAI) {
     throw new Error('Gemini API not initialized. Please add your API key.');
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
 
     // Remove header from base64 string if present
     const cleanBase64 = base64Image.split(',')[1] || base64Image;
 
+    const promptParts = [getSystemPrompt(language)];
+
+    if (additionalContext) {
+      promptParts.push(`\nUser specific context/modifications: "${additionalContext}"\nTake this context into account for nutrition calculation and tags.`);
+    }
+
     const result = await model.generateContent([
-      getSystemPrompt(language),
+      ...promptParts,
       {
         inlineData: {
           mimeType: "image/jpeg",
@@ -112,7 +118,7 @@ export const analyzeFoodFromText = async (description, language = 'ua') => {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
 
     const result = await model.generateContent([
       getSystemPrompt(language),

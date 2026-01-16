@@ -16,21 +16,26 @@ describe('dateUtils', () => {
     describe('formatDate', () => {
         it('returns "Today" for current date', () => {
             const today = '2024-01-15';
-            expect(formatDate(today)).toBe('Today');
+            expect(formatDate(today, 'en-US')).toBe('Today');
         });
 
         it('returns "Yesterday" for previous date', () => {
             const yesterday = '2024-01-14';
-            expect(formatDate(yesterday)).toBe('Yesterday');
+            expect(formatDate(yesterday, 'en-US')).toBe('Yesterday');
         });
 
         it('returns formatted date for other days', () => {
             const otherDay = '2024-01-10';
-            // Expected: "Wed, Jan 10" (assuming en-US locale)
-            // Note: Locale might depend on system running test, but jsdom usually defaults en-US.
-            // We check for "Jan 10" to be safe or full string.
-            const result = formatDate(otherDay);
+            const result = formatDate(otherDay, 'en-US');
             expect(result).toMatch(/Jan 10/);
+        });
+
+        it('returns localized date for UA', () => {
+            const today = '2024-01-15';
+            expect(formatDate(today, 'ua')).toBe('Сьогодні');
+
+            const yesterday = '2024-01-14';
+            expect(formatDate(yesterday, 'ua')).toBe('Вчора');
         });
     });
 

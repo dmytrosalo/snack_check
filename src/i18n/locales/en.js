@@ -1,14 +1,18 @@
 export default {
     translation: {
         app: {
-            title: 'PlateMate'
+            title: 'PlateMate',
+            welcome: '👋 Welcome! Tap here to add your Gemini API key and start tracking.'
         },
         input: {
             placeholder: 'Describe your food...',
+            descriptionOptional: 'Description (optional)...',
             camera: 'Camera',
+            uploadImage: 'Upload Image',
             send: 'Send',
             add: 'Add Entry',
-            analyzing: 'Analyzing...'
+            analyzing: 'Analyzing...',
+            confidence: 'Confidence'
         },
         detail: {
             calories: 'Calories',
@@ -21,6 +25,16 @@ export default {
             delete: 'Delete Entry',
             confirmDelete: 'Are you sure you want to delete this entry?'
         },
+        summary: {
+            title: "Today's Calories",
+            remaining: 'remaining',
+            over: 'over'
+        },
+        camera: {
+            title: 'Take Photo',
+            error: 'Could not access camera. Please grant permission.',
+            tryAgain: 'Try Again'
+        },
         meme: {
             title: 'Meal Logged!',
             subtitle: "Here's a meme for keeping it real.",
@@ -32,6 +46,11 @@ export default {
             apiKey: 'Gemini API Key',
             noApiKey: 'Please add your Gemini API Key in settings.',
             save: 'Save'
+        },
+        log: {
+            emptyTitle: 'No food logged yet',
+            emptySubtitle: 'Add your first meal using text or photo',
+            todayTitle: "Today's Log"
         },
         errors: {
             limitReached: 'Daily request limit reached (30). Add your own API Key to continue.',

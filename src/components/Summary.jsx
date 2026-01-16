@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../stores/appStore';
 
 function CircularProgress({ value, max, color, size = 80, strokeWidth = 8 }) {
@@ -69,6 +70,7 @@ function MacroBar({ label, value, max, color, unit = 'g' }) {
 }
 
 export default function Summary({ entries }) {
+  const { t } = useTranslation();
   const { dailyGoals } = useAppStore();
 
   const totals = useMemo(() => {
@@ -90,7 +92,7 @@ export default function Summary({ entries }) {
       {/* Main Calories Display */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-slate-400 text-sm mb-1">Today's Calories</h2>
+          <h2 className="text-slate-400 text-sm mb-1">{t('summary.title')}</h2>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-bold text-white">
               {Math.round(totals.calories)}
@@ -98,9 +100,9 @@ export default function Summary({ entries }) {
             <span className="text-slate-500">/ {dailyGoals.calories}</span>
           </div>
           <p className={`text-sm mt-1 ${remaining >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-            {remaining >= 0 
-              ? `${Math.round(remaining)} remaining`
-              : `${Math.abs(Math.round(remaining))} over`
+            {remaining >= 0
+              ? `${Math.round(remaining)} ${t('summary.remaining')}`
+              : `${Math.abs(Math.round(remaining))} ${t('summary.over')}`
             }
           </p>
         </div>
@@ -116,19 +118,19 @@ export default function Summary({ entries }) {
       {/* Macros */}
       <div className="space-y-3">
         <MacroBar
-          label="Protein"
+          label={t('detail.protein')}
           value={totals.protein}
           max={dailyGoals.protein}
           color="#3b82f6"
         />
         <MacroBar
-          label="Carbs"
+          label={t('detail.carbs')}
           value={totals.carbs}
           max={dailyGoals.carbs}
           color="#f59e0b"
         />
         <MacroBar
-          label="Fat"
+          label={t('detail.fat')}
           value={totals.fat}
           max={dailyGoals.fat}
           color="#ec4899"
