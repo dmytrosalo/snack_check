@@ -23,7 +23,6 @@ export default function Settings({ onClose }) {
   };
 
   return (
-  return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -51,8 +50,8 @@ export default function Settings({ onClose }) {
             <button
               onClick={() => handleLanguageChange('ua')}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${language === 'ua'
-                  ? 'bg-emerald-500 text-white shadow-lg'
-                  : 'text-slate-400 hover:text-white'
+                ? 'bg-emerald-500 text-white shadow-lg'
+                : 'text-slate-400 hover:text-white'
                 }`}
             >
               🇺🇦 Українська
@@ -60,8 +59,8 @@ export default function Settings({ onClose }) {
             <button
               onClick={() => handleLanguageChange('en')}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${language === 'en'
-                  ? 'bg-emerald-500 text-white shadow-lg'
-                  : 'text-slate-400 hover:text-white'
+                ? 'bg-emerald-500 text-white shadow-lg'
+                : 'text-slate-400 hover:text-white'
                 }`}
             >
               🇺🇸 English
