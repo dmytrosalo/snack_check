@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar, User } from 'lucide-react';
 import { Trash2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -12,15 +12,18 @@ import FoodInput from './components/FoodInput';
 import FoodLog from './components/FoodLog';
 import { analyzeFoodFromImage } from './lib/gemini';
 import { addFoodEntry } from './lib/db';
+import Avatar from './components/Avatar';
 
 const Camera = lazy(() => import('./components/Camera'));
 const Settings = lazy(() => import('./components/Settings'));
+const AvatarScreen = lazy(() => import('./components/AvatarScreen'));
 const FoodDetail = lazy(() => import('./components/FoodDetail'));
 const MemeReward = lazy(() => import('./components/MemeReward'));
 
 function App() {
   const { t, i18n } = useTranslation();
   const [selectedEntry, setSelectedEntry] = useState(null);
+  const [showAvatar, setShowAvatar] = useState(false);
   const [currentMeme, setCurrentMeme] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -36,7 +39,8 @@ function App() {
     clearError,
     setError,
     selectedDate,
-    setSelectedDate
+    setSelectedDate,
+    equippedItems
   } = useAppStore();
 
   // Reactive DB query
@@ -110,9 +114,17 @@ function App() {
   };
 
   const handlePostTracking = (entry) => {
-    const { lifetimeLogs, incrementLifetimeLogs } = useAppStore.getState();
+    const { lifetimeLogs, incrementLifetimeLogs, unlockItem, unlockedItems } = useAppStore.getState();
     const count = lifetimeLogs + 1;
     incrementLifetimeLogs();
+
+    // Unlock logic: Unlock item ID corresponding to count (up to 10)
+    if (count <= 10 && !unlockedItems.includes(count)) {
+      unlockItem(count);
+      setError(`🎉 You unlocked a new item!`); // Reusing error toast for success temporarily
+      setShowAvatar(true); // Open avatar screen to show reward
+      return;
+    }
 
     if (count % 5 === 0) {
       // Every 5th log -> Show Meme
@@ -191,10 +203,19 @@ function App() {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800/50 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-sm">
-              {t('app.title')}
-            </h1>
+          <h1 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-sm">
+            {t('app.title')}
+          </h1>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowAvatar(true)}
+              className="relative p-0.5 bg-emerald-500/10 rounded-full hover:bg-emerald-500/20 transition-colors border border-emerald-500/20 w-10 h-10 overflow-hidden"
+              aria-label={t('avatar.title')}
+            >
+              <div className="absolute top-1 left-1/2 -translate-x-1/2 transform scale-[0.18] origin-top">
+                <Avatar equipped={equippedItems} />
+              </div>
+            </button>
             <button
               onClick={() => setShowSettings(true)}
               className="p-2 bg-slate-800/50 rounded-full hover:bg-slate-700/50 transition-colors"
@@ -281,6 +302,13 @@ function App() {
       {showSettings && (
         <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
           <Settings onClose={() => setShowSettings(false)} />
+        </Suspense>
+      )}
+
+      {/* Avatar Modal */}
+      {showAvatar && (
+        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
+          <AvatarScreen onClose={() => setShowAvatar(false)} />
         </Suspense>
       )}
 

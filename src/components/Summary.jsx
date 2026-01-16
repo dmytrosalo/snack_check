@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../stores/appStore';
+import { Flame } from 'lucide-react';
 
 function CircularProgress({ value, max, color, size = 80, strokeWidth = 8 }) {
   const radius = (size - strokeWidth) / 2;
@@ -106,6 +107,14 @@ export default function Summary({ entries }) {
             }
           </p>
         </div>
+
+        {/* Flame Icon */}
+        <div className="flex-1 flex justify-center px-4">
+          <div className="p-3 bg-orange-500/10 rounded-full animate-pulse border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+            <Flame size={28} className="text-orange-500 fill-orange-500/50" />
+          </div>
+        </div>
+
         <CircularProgress
           value={totals.calories}
           max={dailyGoals.calories}

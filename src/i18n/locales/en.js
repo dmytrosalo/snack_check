@@ -35,6 +35,11 @@ export default {
             error: 'Could not access camera. Please grant permission.',
             tryAgain: 'Try Again'
         },
+        avatar: {
+            title: 'Your Style',
+            wardrobe: 'Wardrobe',
+            lvl: 'LVL'
+        },
         meme: {
             title: 'Meal Logged!',
             subtitle: "Here's a meme for keeping it real.",
@@ -44,6 +49,7 @@ export default {
             title: 'Settings',
             language: 'Language',
             apiKey: 'Gemini API Key',
+            dailyGoal: 'Daily Goal (kcal)',
             noApiKey: 'Please add your Gemini API Key in settings.',
             save: 'Save'
         },

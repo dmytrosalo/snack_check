@@ -35,6 +35,11 @@ export default {
             error: 'Не вдалося отримати доступ до камери. Будь ласка, надайте дозвіл.',
             tryAgain: 'Спробувати знову'
         },
+        avatar: {
+            title: 'Ваш Стиль',
+            wardrobe: 'Гардероб',
+            lvl: 'РІВЕНЬ'
+        },
         meme: {
             title: 'Страву додано!',
             subtitle: 'Ось мем за старання.',
@@ -44,6 +49,7 @@ export default {
             title: 'Налаштування',
             language: 'Мова',
             apiKey: 'Gemini API Ключ',
+            dailyGoal: 'Денна ціль (ккал)',
             save: 'Зберегти',
             noApiKey: 'Будь ласка, додайте ваш ключ Gemini API в налаштуваннях.'
         },

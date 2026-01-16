@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.0.11] - 2026-01-16
+### Disco Elysium Redesign 🎨
+- **Painterly Avatar**: Implemented a procedural "oil-paint" filter for the avatar using SVG `feTurbulence` and `feDisplacementMap`.
+- **Atmosphere**: Added "Thought Cabinet" style abstract background textures.
+- **UI Overhaul**: Redesigned `AvatarScreen` with serif fonts, "Pigment" color selectors, and high-contrast visuals to match the game's aesthetic.
+
+### Avatar Gamification 👕
+- **Wardrobe System**: Unlocked items (Shirt, Jeans, Sneakers) can now be equipped/unequipped.
+- **Color Customization**: Added ability to dye individual clothing items with a 19-color palette.
+- **Dynamic Icons**: Wardrobe grid icons now reflect the currently selected color of the item.
+- **Mini Avatar**: Added a live-updating mini avatar button in the header.
+
+### Core Features 🔥
+- **Calorie Goals**: Added a setting to customize the daily calorie limit.
+- **Summary Update**: Added a pulsing "Flame" icon to the dashboard summary card for better visual feedback.
+
 ## [0.0.10] - 2026-01-16
 ### Localization 🇺🇦 / 🇺🇸
 - **Multi-Language Support**: Added full support for **Ukrainian (UA)** and **English (EN)**.

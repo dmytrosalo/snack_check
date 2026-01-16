@@ -1,16 +1,20 @@
 import { useState } from 'react';
-import { X, Save, Key, Globe } from 'lucide-react';
+import { X, Save, Key, Globe, Target } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import { useTranslation } from 'react-i18next';
 import { initGemini } from '../lib/gemini';
 
 export default function Settings({ onClose }) {
-  const { apiKey, setApiKey, language, setLanguage } = useAppStore();
+  const { apiKey, setApiKey, language, setLanguage, dailyGoals, setDailyGoals } = useAppStore();
   const [keyInput, setKeyInput] = useState(apiKey);
+  const [caloriesInput, setCaloriesInput] = useState(dailyGoals.calories);
   const { t, i18n } = useTranslation();
 
   const handleSave = () => {
     setApiKey(keyInput);
+    if (caloriesInput && !isNaN(caloriesInput)) {
+      setDailyGoals({ calories: parseInt(caloriesInput) });
+    }
     if (keyInput) {
       initGemini(keyInput);
     }
@@ -69,6 +73,21 @@ export default function Settings({ onClose }) {
         </div>
 
         <div className="space-y-6">
+          {/* Daily Goal Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Target size={16} className="text-emerald-400" />
+              <label className="text-sm font-medium text-slate-400">{t('settings.dailyGoal')}</label>
+            </div>
+            <input
+              type="number"
+              value={caloriesInput}
+              onChange={(e) => setCaloriesInput(e.target.value)}
+              placeholder="e.g. 2000"
+              className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+            />
+          </div>
+
           {/* API Key Section */}
           <div>
             <div className="flex items-center gap-2 mb-2">
