@@ -10,17 +10,23 @@ export function isGeminiInitialized() {
   return genAI !== null;
 }
 
-const FOOD_ANALYSIS_PROMPT = `Analyze food. Return JSON only:
+const FOOD_ANALYSIS_PROMPT = `Analyze the food image or description.
+IMPORTANT:
+1. Estimate the TOTAL quantity/portion size visible or described (e.g., "3 apples", "large bowl of pasta").
+2. Calculate nutrition for the WHOLE portion/quantity.
+3. If multiple items are present, sum up their values.
+
+Return valid JSON only:
 {
-  "name": "food name",
-  "calories": number,
-  "protein": number (g),
-  "carbs": number (g),
-  "fat": number (g),
-  "portion": "portion size",
+  "name": "concise food name (e.g. '3 Medium Apples')",
+  "calories": number (total kcal),
+  "protein": number (total g),
+  "carbs": number (total g),
+  "fat": number (total g),
+  "portion": "estimated quantity (e.g. '3 fruits', '200g')",
   "confidence": "high"|"medium"|"low"
 }
-If unclear, return: {"error": "reason"}`;
+If unclear/not food, return: {"error": "reason"}`;
 
 export async function analyzeFood(input, isImage = false) {
   if (!genAI) {

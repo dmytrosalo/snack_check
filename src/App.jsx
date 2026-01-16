@@ -84,13 +84,13 @@ function App() {
   }, [error, clearError]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 to-slate-800 text-white">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800/50 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-              CalTrack
+              SnackTrack
             </h1>
             <p className="text-slate-500 text-xs">AI-Powered Nutrition</p>
           </div>
@@ -116,7 +116,7 @@ function App() {
       )}
 
       {/* Main Content */}
-      <main className="px-4 py-4 pb-8 space-y-4 max-w-lg mx-auto">
+      <main className="px-4 py-4 pb-24 space-y-4 max-w-lg mx-auto">
         {/* API Key Prompt */}
         {!apiKey && !import.meta.env.VITE_GEMINI_API_KEY && (
           <div

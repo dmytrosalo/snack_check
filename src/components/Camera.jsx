@@ -1,3 +1,5 @@
+import { useState, useRef, useEffect } from 'react';
+import { X, Camera as CameraIcon, RotateCcw, Check } from 'lucide-react';
 import { resizeImage } from '../lib/imageUtils';
 
 export default function Camera({ onCapture, onClose }) {

@@ -1,4 +1,4 @@
-# CalTrack - AI-Powered Calories Tracker PWA
+# SnackTrack - AI-Powered Calories Tracker PWA
 
 A modern Progressive Web App for tracking calories using AI-powered food recognition via Google Gemini.
 
