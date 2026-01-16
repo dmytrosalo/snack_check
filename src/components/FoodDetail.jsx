@@ -16,8 +16,13 @@ export default function FoodDetail({ entry, onClose }) {
         }
     };
 
-    const formatTime = (timestamp) => {
-        return new Date(timestamp).toLocaleTimeString([], {
+    const formatTime = (ts) => {
+        if (!ts) return '';
+        const d = new Date(ts);
+        // Check if date is valid
+        if (isNaN(d.getTime())) return '';
+
+        return d.toLocaleTimeString([], {
             hour: '2-digit',
             minute: '2-digit'
         });
@@ -42,7 +47,7 @@ export default function FoodDetail({ entry, onClose }) {
                         <h2 className="text-2xl font-bold text-white leading-tight">{entry.name}</h2>
                         <div className="flex items-center gap-2 text-slate-400 text-sm mt-1">
                             <Clock size={14} />
-                            <span>{formatTime(entry.timestamp)}</span>
+                            <span>{formatTime(entry.timestamp || entry.date) || 'Recent'}</span>
                         </div>
                     </div>
                     <button
@@ -128,13 +133,22 @@ export default function FoodDetail({ entry, onClose }) {
                     </div>
                 </div>
 
-                <button
-                    onClick={handleDelete}
-                    className="w-full py-4 rounded-xl bg-red-500/10 text-red-500 font-medium hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
-                >
-                    <Trash2 size={20} />
-                    Delete Entry
-                </button>
+                {/* Actions */}
+                <div className="flex gap-3">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-emerald-500/20"
+                    >
+                        OK
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        className="p-4 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 active:scale-[0.98] transition-all"
+                        aria-label="Delete Entry"
+                    >
+                        <Trash2 size={24} />
+                    </button>
+                </div>
             </div>
         </div>
     );

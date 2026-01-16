@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import FoodDetail from './FoodDetail';
 import { deleteFoodEntry } from '../lib/db';
 
@@ -41,16 +41,12 @@ describe('FoodDetail', () => {
         expect(screen.getByText('Enjoy the gains, buddy!')).toBeInTheDocument();
     });
 
-    it('calls onClose when close button is clicked', () => {
+    it('calls onClose when OK button is clicked', () => {
         const handleClose = vi.fn();
         render(<FoodDetail entry={mockEntry} onClose={handleClose} />);
 
-        // Assuming close button is the X icon based button
-        // It's usually the first button or found by role
-        // In our component it's <button onClick={onClose}>
-        const buttons = screen.getAllByRole('button');
-        // First button is close (X), second is delete
-        fireEvent.click(buttons[0]);
+        const okButton = screen.getByRole('button', { name: /ok/i });
+        fireEvent.click(okButton);
 
         expect(handleClose).toHaveBeenCalled();
     });
@@ -58,16 +54,18 @@ describe('FoodDetail', () => {
     it('calls deleteFoodEntry when delete is clicked and confirmed', async () => {
         const handleClose = vi.fn();
         // Mock window.confirm to return true
-        vi.spyOn(window, 'confirm').mockImplementation(() => true);
+        const mockConfirm = vi.spyOn(window, 'confirm');
+        mockConfirm.mockImplementation(() => true);
 
         render(<FoodDetail entry={mockEntry} onClose={handleClose} />);
 
-        const deleteBtn = screen.getByText(/Delete Entry/i);
+        // Helper to find the Delete button by aria-label since it has no text
+        const deleteBtn = screen.getByRole('button', { name: /delete entry/i });
         fireEvent.click(deleteBtn);
 
-        expect(window.confirm).toHaveBeenCalled();
+        expect(mockConfirm).toHaveBeenCalled();
         expect(deleteFoodEntry).toHaveBeenCalledWith(123);
         // onClose should be called after delete, need to wait for async
-        await vi.waitFor(() => expect(handleClose).toHaveBeenCalled());
+        await waitFor(() => expect(handleClose).toHaveBeenCalled());
     });
 });

@@ -1,6 +1,9 @@
 # Changelog
 
-## [0.0.8] - 2026-01-16
+## [0.0.9] - 2026-01-16
+### User Interface Fixes
+- **Detail View**: Fixed "Invalid Date" display bug by handling legacy and new timestamp formats correctly.
+- **Button Redesign**: Replaced single delete button with a large "OK" button (to close) and a smaller, discreet "Delete" icon button to improve UX safety and clarity.
 ### Gamification & Personality
 - **Logic Update**: Meme rewards now appear only on every **5th** logged meal to make them feel special.
 - **AI Tone**: Updated personality to be "edgier" and brutally honest about junk food (e.g., "Do you want to be fat?") for stronger motivation.
