@@ -13,8 +13,13 @@ import { addFoodEntry } from './lib/db';
 
 const Camera = lazy(() => import('./components/Camera'));
 const Settings = lazy(() => import('./components/Settings'));
+const FoodDetail = lazy(() => import('./components/FoodDetail'));
 
 function App() {
+  const [selectedEntry, setSelectedEntry] = useState(null);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
   const {
     apiKey,
     showSettings,
@@ -49,7 +54,45 @@ function App() {
 
   const changeDate = (days) => {
     const newDate = getRelativeDate(selectedDate, days);
+
+    // Prevent going to future
+    if (days > 0 && selectedDate === new Date().toISOString().split('T')[0]) {
+      return;
+    }
+
     setSelectedDate(newDate);
+  };
+
+  // Swipe handlers
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      // Swiping Left -> Next Day (like pages of a book, next page is on right, so you swipe left to bring it in? Or timeline?)
+      // Timeline convention: Past is Left, Future is Right.
+      // Swipe Left (finger moves Left) -> Moves content Left -> Reveals content on Right (Future)
+      changeDate(1);
+    }
+
+    if (isRightSwipe) {
+      // Swipe Right (finger moves Right) -> Moves content Right -> Reveals content on Left (Past)
+      changeDate(-1);
+    }
   };
 
   // Handle camera capture
@@ -102,7 +145,12 @@ function App() {
   }, [error, clearError]);
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <div
+      className="min-h-[100dvh] bg-gradient-to-b from-slate-900 to-slate-800 text-white"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Header */}
       <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800/50 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
@@ -178,6 +226,7 @@ function App() {
 
         <FoodLog
           entries={entries}
+          onItemClick={setSelectedEntry}
         />
       </main>
 
@@ -195,6 +244,16 @@ function App() {
       {showSettings && (
         <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
           <Settings onClose={() => setShowSettings(false)} />
+        </Suspense>
+      )}
+
+      {/* Food Detail Modal */}
+      {selectedEntry && (
+        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
+          <FoodDetail
+            entry={selectedEntry}
+            onClose={() => setSelectedEntry(null)}
+          />
         </Suspense>
       )}
     </div>

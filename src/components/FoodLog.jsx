@@ -2,10 +2,11 @@ import { Trash2, Clock } from 'lucide-react';
 import { deleteFoodEntry } from '../lib/db';
 import { useAppStore } from '../stores/appStore';
 
-export default function FoodLog({ entries }) {
+export default function FoodLog({ entries, onItemClick }) {
   const { setError } = useAppStore();
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, e) => {
+    e.stopPropagation();
     if (window.confirm('Are you sure you want to delete this entry?')) {
       try {
         await deleteFoodEntry(id);
@@ -43,7 +44,8 @@ export default function FoodLog({ entries }) {
       {entries.map((entry, index) => (
         <div
           key={entry.id}
-          className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-4 border border-slate-700/50 animate-slide-up"
+          onClick={() => onItemClick && onItemClick(entry)}
+          className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-4 border border-slate-700/50 animate-slide-up cursor-pointer active:scale-[0.98] transition-all hover:bg-slate-800/70"
           style={{ animationDelay: `${index * 50}ms` }}
         >
           <div className="flex gap-3">
@@ -66,7 +68,7 @@ export default function FoodLog({ entries }) {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleDelete(entry.id)}
+                  onClick={(e) => handleDelete(entry.id, e)}
                   className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
                 >
                   <Trash2 size={16} />
