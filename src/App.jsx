@@ -1,21 +1,22 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Settings as SettingsIcon, X } from 'lucide-react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { Settings as SettingsIcon, X, Loader2 } from 'lucide-react';
 import { useAppStore } from './stores/appStore';
 import { initGemini } from './lib/gemini';
 import { getTodayEntries } from './lib/db';
 import Summary from './components/Summary';
 import FoodInput from './components/FoodInput';
 import FoodLog from './components/FoodLog';
-import Camera from './components/Camera';
-import Settings from './components/Settings';
 import { analyzeFoodFromImage } from './lib/gemini';
 import { addFoodEntry } from './lib/db';
 
+const Camera = lazy(() => import('./components/Camera'));
+const Settings = lazy(() => import('./components/Settings'));
+
 function App() {
   const [entries, setEntries] = useState([]);
-  const { 
-    apiKey, 
-    showSettings, 
+  const {
+    apiKey,
+    showSettings,
     setShowSettings,
     showCamera,
     setShowCamera,
@@ -32,17 +33,31 @@ function App() {
 
   useEffect(() => {
     loadEntries();
-    
-    // Initialize Gemini if API key exists
+
+    // Initialize Gemini if API key exists or fallback to env var
+    const defaultKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (apiKey) {
       initGemini(apiKey);
+    } else if (defaultKey) {
+      initGemini(defaultKey);
     }
   }, [apiKey, loadEntries]);
 
   // Handle camera capture
   const handleCameraCapture = async (imageDataUrl) => {
+    // Check limit if using default key
+    if (!apiKey) {
+      const { requestCount, incrementRequestCount } = useAppStore.getState();
+      if (requestCount >= 30) {
+        setShowCamera(false);
+        setError('Free limit reached (30 requests). Please add your own API key in settings.');
+        setShowSettings(true);
+        return;
+      }
+    }
+
     setShowCamera(false);
-    
+
     try {
       const result = await analyzeFoodFromImage(imageDataUrl);
       await addFoodEntry({
@@ -50,6 +65,11 @@ function App() {
         imageUrl: imageDataUrl
       });
       loadEntries();
+
+      // Increment count only if using default key
+      if (!apiKey) {
+        useAppStore.getState().incrementRequestCount();
+      }
     } catch (err) {
       setError(err.message);
     }
@@ -98,8 +118,8 @@ function App() {
       {/* Main Content */}
       <main className="px-4 py-4 pb-8 space-y-4 max-w-lg mx-auto">
         {/* API Key Prompt */}
-        {!apiKey && (
-          <div 
+        {!apiKey && !import.meta.env.VITE_GEMINI_API_KEY && (
+          <div
             onClick={() => setShowSettings(true)}
             className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 cursor-pointer hover:bg-amber-500/20 transition-colors"
           >
@@ -110,29 +130,33 @@ function App() {
         )}
 
         <Summary entries={entries} />
-        
-        <FoodInput 
-          onShowCamera={() => setShowCamera(true)} 
+
+        <FoodInput
+          onShowCamera={() => setShowCamera(true)}
           onEntryAdded={loadEntries}
         />
-        
-        <FoodLog 
-          entries={entries} 
+
+        <FoodLog
+          entries={entries}
           onEntryDeleted={loadEntries}
         />
       </main>
 
       {/* Camera Modal */}
       {showCamera && (
-        <Camera
-          onCapture={handleCameraCapture}
-          onClose={() => setShowCamera(false)}
-        />
+        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
+          <Camera
+            onCapture={handleCameraCapture}
+            onClose={() => setShowCamera(false)}
+          />
+        </Suspense>
       )}
 
       {/* Settings Modal */}
       {showSettings && (
-        <Settings onClose={() => setShowSettings(false)} />
+        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
+          <Settings onClose={() => setShowSettings(false)} />
+        </Suspense>
       )}
     </div>
   );

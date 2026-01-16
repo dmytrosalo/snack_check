@@ -1,5 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
-import { X, Camera as CameraIcon, RotateCcw, Check } from 'lucide-react';
+import { resizeImage } from '../lib/imageUtils';
 
 export default function Camera({ onCapture, onClose }) {
   const videoRef = useRef(null);
@@ -8,6 +7,7 @@ export default function Camera({ onCapture, onClose }) {
   const [capturedImage, setCapturedImage] = useState(null);
   const [facingMode, setFacingMode] = useState('environment'); // back camera
   const [error, setError] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     startCamera();
@@ -52,13 +52,13 @@ export default function Camera({ onCapture, onClose }) {
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    
+
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
-    
+
     const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
     setCapturedImage(imageDataUrl);
   };
@@ -67,10 +67,21 @@ export default function Camera({ onCapture, onClose }) {
     setCapturedImage(null);
   };
 
-  const confirm = () => {
-    if (capturedImage) {
-      onCapture(capturedImage);
-      onClose();
+  const confirm = async () => {
+    if (capturedImage && !isProcessing) {
+      setIsProcessing(true);
+      try {
+        const resized = await resizeImage(capturedImage);
+        onCapture(resized);
+        onClose();
+      } catch (err) {
+        console.error('Failed to process image:', err);
+        // Fallback to original if resize fails
+        onCapture(capturedImage);
+        onClose();
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -141,9 +152,14 @@ export default function Camera({ onCapture, onClose }) {
             </button>
             <button
               onClick={confirm}
-              className="p-4 rounded-full bg-emerald-500 text-white"
+              disabled={isProcessing}
+              className="p-4 rounded-full bg-emerald-500 text-white disabled:opacity-50"
             >
-              <Check size={32} />
+              {isProcessing ? (
+                <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Check size={32} />
+              )}
             </button>
           </>
         ) : (

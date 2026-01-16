@@ -3,6 +3,7 @@ import { Camera, Send, Image, Loader2, X } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import { analyzeFoodFromText, analyzeFoodFromImage, isGeminiInitialized } from '../lib/gemini';
 import { addFoodEntry } from '../lib/db';
+import { resizeImage } from '../lib/imageUtils';
 
 export default function FoodInput({ onShowCamera, onEntryAdded }) {
   const [input, setInput] = useState('');
@@ -10,7 +11,7 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState(null);
   const fileInputRef = useRef(null);
-  
+
   const { setError, setShowSettings, apiKey } = useAppStore();
 
   const handleImageSelect = (e) => {
@@ -18,8 +19,15 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
-      setPreviewImage(event.target.result);
+    reader.onload = async (event) => {
+      try {
+        const originalUrl = event.target.result;
+        const resizedUrl = await resizeImage(originalUrl);
+        setPreviewImage(resizedUrl);
+      } catch (err) {
+        console.error('Failed to resize image:', err);
+        setPreviewImage(event.target.result);
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -33,10 +41,20 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
   };
 
   const handleAnalyze = async () => {
-    if (!isGeminiInitialized()) {
-      setError('Please add your Gemini API key in settings');
-      setShowSettings(true);
-      return;
+    // Check limit if using default key
+    if (!apiKey) {
+      if (!isGeminiInitialized()) {
+        setError('Please add your Gemini API key in settings');
+        setShowSettings(true);
+        return;
+      }
+
+      const { requestCount } = useAppStore.getState();
+      if (requestCount >= 30) {
+        setError('Free limit reached (30 requests). Please add your own API key in settings.');
+        setShowSettings(true);
+        return;
+      }
     }
 
     if (!input.trim() && !previewImage) return;
@@ -52,6 +70,11 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
         result = await analyzeFoodFromText(input);
       }
       setAnalysisResult(result);
+
+      // Increment count only if using default key
+      if (!apiKey) {
+        useAppStore.getState().incrementRequestCount();
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -67,7 +90,7 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
         ...analysisResult,
         imageUrl: previewImage || null
       });
-      
+
       // Reset form
       setInput('');
       setPreviewImage(null);
@@ -75,7 +98,7 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-      
+
       onEntryAdded?.();
     } catch (err) {
       setError('Failed to save entry');
@@ -117,13 +140,12 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
         <div className="mb-3 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl animate-slide-up">
           <div className="flex items-center justify-between mb-2">
             <h4 className="font-semibold text-emerald-400">{analysisResult.name}</h4>
-            <span className={`text-xs px-2 py-0.5 rounded-full ${
-              analysisResult.confidence === 'high' 
-                ? 'bg-emerald-500/20 text-emerald-400' 
-                : analysisResult.confidence === 'medium'
+            <span className={`text-xs px-2 py-0.5 rounded-full ${analysisResult.confidence === 'high'
+              ? 'bg-emerald-500/20 text-emerald-400'
+              : analysisResult.confidence === 'medium'
                 ? 'bg-yellow-500/20 text-yellow-400'
                 : 'bg-red-500/20 text-red-400'
-            }`}>
+              }`}>
               {analysisResult.confidence} confidence
             </span>
           </div>
@@ -146,7 +168,7 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
             </div>
           </div>
           <p className="text-slate-400 text-xs mt-2">Portion: {analysisResult.portion}</p>
-          
+
           <button
             onClick={handleAddEntry}
             className="w-full mt-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium transition-colors"
