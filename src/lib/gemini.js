@@ -16,7 +16,7 @@ IMPORTANT:
 2. Calculate nutrition for the WHOLE portion/quantity.
 3. If multiple items are present, sum up their values.
 4. Identify dietary tags (e.g., "High Protein", "Vegan", "Keto Friendly", "Gluten Free", "High Sugar").
-5. Provide a short health tip or verdict (1 sentence).
+5. Provide a short, sassy, funny, or motivational comment. Act like a gym buddy with personality. If it's healthy, cheer them on. If it's junk food, lightly roast them (but be funny). Max 1 sentence.
 
 Return valid JSON only:
 {

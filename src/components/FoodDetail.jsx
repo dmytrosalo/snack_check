@@ -110,7 +110,7 @@ export default function FoodDetail({ entry, onClose }) {
                 <div className="space-y-4 mb-8">
                     {entry.healthTip && (
                         <div className="bg-indigo-500/10 p-4 rounded-xl border border-indigo-500/20">
-                            <h4 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Health Insight</h4>
+                            <h4 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">PlateMate Says 🤖</h4>
                             <p className="text-slate-200 text-sm">{entry.healthTip}</p>
                         </div>
                     )}

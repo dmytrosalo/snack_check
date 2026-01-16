@@ -14,9 +14,11 @@ import { addFoodEntry } from './lib/db';
 const Camera = lazy(() => import('./components/Camera'));
 const Settings = lazy(() => import('./components/Settings'));
 const FoodDetail = lazy(() => import('./components/FoodDetail'));
+const MemeReward = lazy(() => import('./components/MemeReward'));
 
 function App() {
   const [selectedEntry, setSelectedEntry] = useState(null);
+  const [currentMeme, setCurrentMeme] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
@@ -95,6 +97,19 @@ function App() {
     }
   };
 
+  const fetchMeme = async () => {
+    try {
+      const res = await fetch('https://meme-api.com/gimme/wholesomememes');
+      const data = await res.json();
+      if (data && data.url) {
+        setCurrentMeme(data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch meme:', e);
+      // Fallback or just silent fail
+    }
+  };
+
   // Handle camera capture
   const handleCameraCapture = async (imageDataUrl) => {
     // Check limit if using default key
@@ -131,6 +146,9 @@ function App() {
       if (!apiKey) {
         useAppStore.getState().incrementRequestCount();
       }
+
+      // Show reward
+      fetchMeme();
     } catch (err) {
       setError(err.message);
     }
@@ -221,7 +239,8 @@ function App() {
         {/* Only allow adding food if selected date is today (optional choice, but let's allow all days for flexibility) */}
         <FoodInput
           onShowCamera={() => setShowCamera(true)}
-          selectedDate={selectedDate} // Pass date to input
+          selectedDate={selectedDate}
+          onSuccess={fetchMeme}
         />
 
         <FoodLog
@@ -253,6 +272,16 @@ function App() {
           <FoodDetail
             entry={selectedEntry}
             onClose={() => setSelectedEntry(null)}
+          />
+        </Suspense>
+      )}
+
+      {/* Meme Reward Modal */}
+      {currentMeme && (
+        <Suspense fallback={null}>
+          <MemeReward
+            meme={currentMeme}
+            onClose={() => setCurrentMeme(null)}
           />
         </Suspense>
       )}

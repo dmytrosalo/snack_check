@@ -5,7 +5,7 @@ import { analyzeFoodFromText, analyzeFoodFromImage, isGeminiInitialized } from '
 import { addFoodEntry } from '../lib/db';
 import { resizeImage } from '../lib/imageUtils';
 
-export default function FoodInput({ onShowCamera, selectedDate }) {
+export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
   const [input, setInput] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -103,6 +103,8 @@ export default function FoodInput({ onShowCamera, selectedDate }) {
 
       clearInput();
       // No need to call onEntryAdded, useLiveQuery handles updates
+      // Trigger meme reward
+      if (onSuccess) onSuccess();
     } catch (err) {
       setError('Failed to save entry');
     }

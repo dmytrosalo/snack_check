@@ -22,6 +22,8 @@ describe('FoodDetail', () => {
         fat: 20,
         portion: '1 large burger',
         timestamp: Date.now(),
+        tags: ['High Protein', 'Cheat Meal'],
+        healthTip: 'Enjoy the gains, buddy!',
     };
 
     it('renders food details correctly', () => {
@@ -31,6 +33,12 @@ describe('FoodDetail', () => {
         expect(screen.getByText('500')).toBeInTheDocument(); // calories
         expect(screen.getByText('30g')).toBeInTheDocument(); // protein
         expect(screen.getByText('1 large burger')).toBeInTheDocument(); // portion
+
+        // New features
+        expect(screen.getByText('High Protein')).toBeInTheDocument();
+        expect(screen.getByText('Cheat Meal')).toBeInTheDocument();
+        expect(screen.getByText(/PlateMate Says/i)).toBeInTheDocument();
+        expect(screen.getByText('Enjoy the gains, buddy!')).toBeInTheDocument();
     });
 
     it('calls onClose when close button is clicked', () => {
