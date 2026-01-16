@@ -1,4 +1,4 @@
-# SnackTrack - AI-Powered Calories Tracker PWA
+# PlateMate - AI-Powered Calories Tracker PWA
 
 A modern Progressive Web App for tracking calories using AI-powered food recognition via Google Gemini.
 

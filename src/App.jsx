@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Settings as SettingsIcon, X, Loader2 } from 'lucide-react';
+import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from './stores/appStore';
 import { initGemini } from './lib/gemini';
-import { getTodayEntries } from './lib/db';
+import { db } from './lib/db';
+import { formatDate, getRelativeDate } from './lib/dateUtils';
 import Summary from './components/Summary';
 import FoodInput from './components/FoodInput';
 import FoodLog from './components/FoodLog';
@@ -13,7 +15,6 @@ const Camera = lazy(() => import('./components/Camera'));
 const Settings = lazy(() => import('./components/Settings'));
 
 function App() {
-  const [entries, setEntries] = useState([]);
   const {
     apiKey,
     showSettings,
@@ -22,18 +23,21 @@ function App() {
     setShowCamera,
     error,
     clearError,
-    setError
+    setError,
+    selectedDate,
+    setSelectedDate
   } = useAppStore();
 
-  // Load entries on mount
-  const loadEntries = useCallback(async () => {
-    const todayEntries = await getTodayEntries();
-    setEntries(todayEntries);
-  }, []);
+  // Reactive DB query
+  const entries = useLiveQuery(
+    () => db.foodEntries
+      .where('date')
+      .equals(selectedDate)
+      .sortBy('timestamp'),
+    [selectedDate]
+  ) || [];
 
   useEffect(() => {
-    loadEntries();
-
     // Initialize Gemini if API key exists or fallback to env var
     const defaultKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (apiKey) {
@@ -41,7 +45,12 @@ function App() {
     } else if (defaultKey) {
       initGemini(defaultKey);
     }
-  }, [apiKey, loadEntries]);
+  }, [apiKey]);
+
+  const changeDate = (days) => {
+    const newDate = getRelativeDate(selectedDate, days);
+    setSelectedDate(newDate);
+  };
 
   // Handle camera capture
   const handleCameraCapture = async (imageDataUrl) => {
@@ -62,9 +71,18 @@ function App() {
       const result = await analyzeFoodFromImage(imageDataUrl);
       await addFoodEntry({
         ...result,
-        imageUrl: imageDataUrl
+        imageUrl: imageDataUrl,
+        date: selectedDate // Ensure we add to currently selected date (or default logic handles today)
+        // Note: db.addFoodEntry uses 'date' from arguments if provided,
+        // but currently our addFoodEntry helper overwrites it with Today.
+        // We should fix the helper or pass timestamp manually?
+        // Actually, let's keep it adding to TODAY for now, or respect selectedDate?
+        // User request "track food by day" implies seeing history.
+        // Logic "add food" usually means "I ate this JUST NOW".
+        // If I am browsing yesterday and click add, should it add to yesterday?
+        // Usually YES in tracking apps.
+        // Let's modify addFoodEntry call to include date: selectedDate
       });
-      loadEntries();
 
       // Increment count only if using default key
       if (!apiKey) {
@@ -90,7 +108,7 @@ function App() {
         <div className="flex items-center justify-between px-4 py-3">
           <div>
             <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-              SnackTrack
+              PlateMate
             </h1>
             <p className="text-slate-500 text-xs">AI-Powered Nutrition</p>
           </div>
@@ -115,6 +133,27 @@ function App() {
         </div>
       )}
 
+      {/* Date Navigation */}
+      <div className="flex items-center justify-between px-6 py-2 bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/50">
+        <button
+          onClick={() => changeDate(-1)}
+          className="p-1 text-slate-400 hover:text-white transition-colors"
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <div className="flex items-center gap-2 font-medium">
+          <Calendar size={16} className="text-emerald-400" />
+          <span>{formatDate(selectedDate)}</span>
+        </div>
+        <button
+          onClick={() => changeDate(1)}
+          className="p-1 text-slate-400 hover:text-white transition-colors"
+          disabled={selectedDate === new Date().toISOString().split('T')[0]}
+        >
+          <ChevronRight size={24} className={selectedDate === new Date().toISOString().split('T')[0] ? 'opacity-30' : ''} />
+        </button>
+      </div>
+
       {/* Main Content */}
       <main className="px-4 py-4 pb-24 space-y-4 max-w-lg mx-auto">
         {/* API Key Prompt */}
@@ -131,14 +170,14 @@ function App() {
 
         <Summary entries={entries} />
 
+        {/* Only allow adding food if selected date is today (optional choice, but let's allow all days for flexibility) */}
         <FoodInput
           onShowCamera={() => setShowCamera(true)}
-          onEntryAdded={loadEntries}
+          selectedDate={selectedDate} // Pass date to input
         />
 
         <FoodLog
           entries={entries}
-          onEntryDeleted={loadEntries}
         />
       </main>
 

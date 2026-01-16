@@ -11,8 +11,8 @@ db.version(1).stores({
 // Helper functions
 export async function addFoodEntry(entry) {
   const timestamp = Date.now();
-  const date = new Date().toISOString().split('T')[0];
-  
+  const date = entry.date || new Date().toISOString().split('T')[0];
+
   return await db.foodEntries.add({
     ...entry,
     date,
@@ -47,12 +47,12 @@ export async function getWeeklyStats() {
   const today = new Date();
   const weekAgo = new Date(today);
   weekAgo.setDate(weekAgo.getDate() - 7);
-  
+
   const entries = await db.foodEntries
     .where('date')
     .between(weekAgo.toISOString().split('T')[0], today.toISOString().split('T')[0], true, true)
     .toArray();
-  
+
   // Group by date
   const grouped = entries.reduce((acc, entry) => {
     if (!acc[entry.date]) {
@@ -64,7 +64,7 @@ export async function getWeeklyStats() {
     acc[entry.date].fat += entry.fat || 0;
     return acc;
   }, {});
-  
+
   return grouped;
 }
 

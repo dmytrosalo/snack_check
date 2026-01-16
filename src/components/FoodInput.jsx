@@ -5,7 +5,7 @@ import { analyzeFoodFromText, analyzeFoodFromImage, isGeminiInitialized } from '
 import { addFoodEntry } from '../lib/db';
 import { resizeImage } from '../lib/imageUtils';
 
-export default function FoodInput({ onShowCamera, onEntryAdded }) {
+export default function FoodInput({ onShowCamera, selectedDate }) {
   const [input, setInput] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -33,6 +33,15 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
   };
 
   const clearPreview = () => {
+    setPreviewImage(null);
+    setAnalysisResult(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const clearInput = () => {
+    setInput('');
     setPreviewImage(null);
     setAnalysisResult(null);
     if (fileInputRef.current) {
@@ -88,18 +97,12 @@ export default function FoodInput({ onShowCamera, onEntryAdded }) {
     try {
       await addFoodEntry({
         ...analysisResult,
-        imageUrl: previewImage || null
+        imageUrl: previewImage || null,
+        date: selectedDate || new Date().toISOString().split('T')[0]
       });
 
-      // Reset form
-      setInput('');
-      setPreviewImage(null);
-      setAnalysisResult(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-
-      onEntryAdded?.();
+      clearInput();
+      // No need to call onEntryAdded, useLiveQuery handles updates
     } catch (err) {
       setError('Failed to save entry');
     }
