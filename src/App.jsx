@@ -19,6 +19,7 @@ const FoodDetail = lazy(() => import('./components/FoodDetail'));
 const MemeReward = lazy(() => import('./components/MemeReward'));
 
 function App() {
+  const { t } = useTranslation();
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [currentMeme, setCurrentMeme] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
@@ -26,6 +27,7 @@ function App() {
 
   const {
     apiKey,
+    language,
     showSettings,
     setShowSettings,
     showCamera,

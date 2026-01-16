@@ -4,6 +4,8 @@ import App from './App.jsx'
 import './index.css' // This line is critical!
 import './i18n/config'; // Initialize i18n
 
+
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
