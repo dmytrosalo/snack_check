@@ -64,8 +64,22 @@ export default function FoodDetail({ entry, onClose }) {
                     </div>
                 )}
 
+                {/* Tags */}
+                {entry.tags && entry.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-6">
+                        {entry.tags.map(tag => (
+                            <span
+                                key={tag}
+                                className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 text-xs font-medium border border-emerald-500/20"
+                            >
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+
                 {/* Macros Grid */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-2 gap-4 mb-6">
                     <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
                         <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
                             <Flame size={16} className="text-orange-500" />
@@ -92,15 +106,24 @@ export default function FoodDetail({ entry, onClose }) {
                     </div>
                 </div>
 
-                {/* Info / Portion */}
-                <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700/30 mb-8">
-                    <div className="flex items-start gap-3">
-                        <Info size={18} className="text-slate-400 mt-0.5" />
-                        <div>
-                            <p className="text-slate-300 text-sm leading-relaxed">
-                                <span className="text-slate-500 block text-xs uppercase tracking-wider mb-1">Portion Estimate</span>
-                                {entry.portion || 'No portion information available.'}
-                            </p>
+                {/* Health Tip / Info */}
+                <div className="space-y-4 mb-8">
+                    {entry.healthTip && (
+                        <div className="bg-indigo-500/10 p-4 rounded-xl border border-indigo-500/20">
+                            <h4 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Health Insight</h4>
+                            <p className="text-slate-200 text-sm">{entry.healthTip}</p>
+                        </div>
+                    )}
+
+                    <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700/30">
+                        <div className="flex items-start gap-3">
+                            <Info size={18} className="text-slate-400 mt-0.5" />
+                            <div>
+                                <p className="text-slate-300 text-sm leading-relaxed">
+                                    <span className="text-slate-500 block text-xs uppercase tracking-wider mb-1">Portion Estimate</span>
+                                    {entry.portion || 'No portion information available.'}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

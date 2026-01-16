@@ -15,6 +15,8 @@ IMPORTANT:
 1. Estimate the TOTAL quantity/portion size visible or described (e.g., "3 apples", "large bowl of pasta").
 2. Calculate nutrition for the WHOLE portion/quantity.
 3. If multiple items are present, sum up their values.
+4. Identify dietary tags (e.g., "High Protein", "Vegan", "Keto Friendly", "Gluten Free", "High Sugar").
+5. Provide a short health tip or verdict (1 sentence).
 
 Return valid JSON only:
 {
@@ -23,7 +25,9 @@ Return valid JSON only:
   "protein": number (total g),
   "carbs": number (total g),
   "fat": number (total g),
-  "portion": "estimated quantity (e.g. '3 fruits', '200g')",
+  "portion": "estimated quantity",
+  "tags": ["tag1", "tag2"],
+  "healthTip": "brief health verdict",
   "confidence": "high"|"medium"|"low"
 }
 If unclear/not food, return: {"error": "reason"}`;
@@ -88,6 +92,8 @@ export async function analyzeFood(input, isImage = false) {
       carbs: Math.round(parsed.carbs) || 0,
       fat: Math.round(parsed.fat) || 0,
       portion: parsed.portion || 'Unknown portion',
+      tags: Array.isArray(parsed.tags) ? parsed.tags : [],
+      healthTip: parsed.healthTip || '',
       confidence: parsed.confidence || 'low'
     };
   } catch (error) {
