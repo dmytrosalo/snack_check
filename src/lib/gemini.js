@@ -112,7 +112,7 @@ export const analyzeFoodFromText = async (description, language = 'ua') => {
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3-flash-latest" });
 
     const result = await model.generateContent([
       getSystemPrompt(language),
