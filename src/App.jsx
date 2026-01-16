@@ -97,6 +97,20 @@ function App() {
     }
   };
 
+  const handlePostTracking = (entry) => {
+    const { lifetimeLogs, incrementLifetimeLogs } = useAppStore.getState();
+    const count = lifetimeLogs + 1;
+    incrementLifetimeLogs();
+
+    if (count % 5 === 0) {
+      // Every 5th log -> Show Meme
+      fetchMeme();
+    } else {
+      // Otherwise -> Show Food Detail (Sassy AI)
+      setSelectedEntry(entry);
+    }
+  };
+
   const fetchMeme = async () => {
     try {
       const res = await fetch('https://meme-api.com/gimme/wholesomememes');
@@ -127,28 +141,21 @@ function App() {
 
     try {
       const result = await analyzeFoodFromImage(imageDataUrl);
-      await addFoodEntry({
+      const entry = {
         ...result,
         imageUrl: imageDataUrl,
         date: selectedDate // Ensure we add to currently selected date (or default logic handles today)
-        // Note: db.addFoodEntry uses 'date' from arguments if provided,
-        // but currently our addFoodEntry helper overwrites it with Today.
-        // We should fix the helper or pass timestamp manually?
-        // Actually, let's keep it adding to TODAY for now, or respect selectedDate?
-        // User request "track food by day" implies seeing history.
-        // Logic "add food" usually means "I ate this JUST NOW".
-        // If I am browsing yesterday and click add, should it add to yesterday?
-        // Usually YES in tracking apps.
-        // Let's modify addFoodEntry call to include date: selectedDate
-      });
+      };
+
+      await addFoodEntry(entry);
 
       // Increment count only if using default key
       if (!apiKey) {
         useAppStore.getState().incrementRequestCount();
       }
 
-      // Show reward
-      fetchMeme();
+      // Show reward or detail
+      handlePostTracking(entry);
     } catch (err) {
       setError(err.message);
     }
@@ -240,7 +247,7 @@ function App() {
         <FoodInput
           onShowCamera={() => setShowCamera(true)}
           selectedDate={selectedDate}
-          onSuccess={fetchMeme}
+          onSuccess={handlePostTracking}
         />
 
         <FoodLog

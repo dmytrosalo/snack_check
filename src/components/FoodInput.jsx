@@ -95,16 +95,18 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
     if (!analysisResult) return;
 
     try {
-      await addFoodEntry({
+      const entry = {
         ...analysisResult,
         imageUrl: previewImage || null,
         date: selectedDate || new Date().toISOString().split('T')[0]
-      });
+      };
+
+      await addFoodEntry(entry);
 
       clearInput();
       // No need to call onEntryAdded, useLiveQuery handles updates
       // Trigger meme reward
-      if (onSuccess) onSuccess();
+      if (onSuccess) onSuccess(entry);
     } catch (err) {
       setError('Failed to save entry');
     }
@@ -209,6 +211,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
           onClick={() => fileInputRef.current?.click()}
           disabled={isAnalyzing}
           className="p-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 rounded-xl transition-colors disabled:opacity-50"
+          aria-label="Upload Image"
         >
           <Image size={22} />
         </button>
@@ -218,6 +221,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
           onClick={onShowCamera}
           disabled={isAnalyzing}
           className="p-3 bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 rounded-xl transition-colors disabled:opacity-50"
+          aria-label="Camera"
         >
           <Camera size={22} />
         </button>
@@ -227,6 +231,7 @@ export default function FoodInput({ onShowCamera, selectedDate, onSuccess }) {
           onClick={analysisResult ? handleAddEntry : handleAnalyze}
           disabled={isAnalyzing || (!input.trim() && !previewImage && !analysisResult)}
           className="p-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label={analysisResult ? "Add Entry" : "Send"}
         >
           {isAnalyzing ? (
             <Loader2 size={22} className="animate-spin" />

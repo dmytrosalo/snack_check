@@ -40,6 +40,10 @@ export const useAppStore = create(
       requestCount: 0,
       incrementRequestCount: () => set((state) => ({ requestCount: state.requestCount + 1 })),
 
+      // Lifetime logs count
+      lifetimeLogs: 0,
+      incrementLifetimeLogs: () => set((state) => ({ lifetimeLogs: state.lifetimeLogs + 1 })),
+
       // Selected date for history view
       selectedDate: new Date().toISOString().split('T')[0],
       setSelectedDate: (date) => set({ selectedDate: date }),
@@ -49,7 +53,8 @@ export const useAppStore = create(
       partialize: (state) => ({
         apiKey: state.apiKey,
         dailyGoals: state.dailyGoals,
-        requestCount: state.requestCount
+        requestCount: state.requestCount,
+        lifetimeLogs: state.lifetimeLogs
       })
     }
   )

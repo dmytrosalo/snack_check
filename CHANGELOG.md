@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8] - 2026-01-16
+### Gamification & Personality
+- **Logic Update**: Meme rewards now appear only on every **5th** logged meal to make them feel special.
+- **AI Tone**: Updated personality to be "edgier" and brutally honest about junk food (e.g., "Do you want to be fat?") for stronger motivation.
+- **Accessibility**: Added `aria-labels` to all input buttons.
+- **Testing**: Added `FoodInput` integration tests covering the new gamification callbacks.
+
 ## [0.0.7] - 2026-01-16
 ### Testing & Quality Assurance
 - Added unit tests for utility functions (`dateUtils`, `imageUtils`).
