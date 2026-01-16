@@ -123,7 +123,10 @@ export default function AvatarScreen({ onClose }) {
                                     ) : (
                                         <div className="flex flex-col items-center gap-1">
                                             <Lock size={20} className="text-slate-600" />
-                                            <span className="text-[10px] font-bold text-slate-600">{t('avatar.lvl')} {item.id}</span>
+                                            <span className="text-[10px] font-bold text-slate-600">
+                                                {/* Calculate unlock requirement: Level * 10 logs */}
+                                                {item.id * 10} Logs
+                                            </span>
                                         </div>
                                     )}
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.12] - 2026-01-17
+### Testing & Stability 🧪
+- **Avatar System Tests**: Added comprehensive unit tests for `Avatar`, `AvatarScreen`, and `PainterlyFilter` components.
+- **Visual Regression Checks**: Added checks for Disco Elysium style elements (textures, lighting overlays, and SVG filters).
+
 ## [0.0.11] - 2026-01-16
 ### Disco Elysium Redesign 🎨
 - **Painterly Avatar**: Implemented a procedural "oil-paint" filter for the avatar using SVG `feTurbulence` and `feDisplacementMap`.

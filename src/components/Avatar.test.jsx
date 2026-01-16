@@ -37,7 +37,19 @@ describe('Avatar Component', () => {
 
     it('applies custom styling for Disco Elysium look', () => {
         const { container } = render(<Avatar equipped={defaultEquipped} itemColors={defaultColors} />);
-        // Check for the border and background classes associated with the DE style
+
+        // Main container styles
         expect(container.firstChild).toHaveClass('border-4 border-slate-700 bg-slate-900 shadow-2xl');
+
+        // Background texture
+        const bgTexture = container.querySelector('[style*="thought_cabinet.png"]');
+        expect(bgTexture).toBeInTheDocument();
+        expect(bgTexture).toHaveClass('mix-blend-overlay');
+
+        // Noir lighting
+        const lighting = container.querySelector('.bg-gradient-to-tr');
+        expect(lighting).toBeInTheDocument();
+        expect(lighting).toHaveClass('from-black/80');
     });
 });
+

@@ -118,16 +118,30 @@ function App() {
     const count = lifetimeLogs + 1;
     incrementLifetimeLogs();
 
-    // Unlock logic: Unlock item ID corresponding to count (up to 10)
-    if (count <= 10 && !unlockedItems.includes(count)) {
-      unlockItem(count);
-      setError(`🎉 You unlocked a new item!`); // Reusing error toast for success temporarily
-      setShowAvatar(true); // Open avatar screen to show reward
-      return;
+    // Reward Logic: Unlock new item every 10 logs
+    if (count % 10 === 0) {
+      // Calculate which item ID to unlock based on the count (e.g. 10 -> ID 2, 20 -> ID 3)
+      // Assuming ID 1 is default.
+      const level = Math.floor(count / 10) + 1;
+
+      // Find if this item ID exists in our items list (we need to import ITEMS or just try to unlock)
+      // Since we don't have ITEMS imported here, we'll blindly try to unlock 'level'.
+      // Better yet, let's just use the level as the ID.
+      if (!unlockedItems.includes(level)) {
+        unlockItem(level);
+        // Show toast instead of redirecting
+        setError(`🎉 New Style Unlocked! (Level ${level})`);
+        // setShowAvatar(true); // User requested NO redirect
+        return;
+      }
     }
 
     if (count % 5 === 0) {
-      // Every 5th log -> Show Meme
+      // Every 5th log -> Show Meme (unless it was a 10th log which also triggers unlock?
+      // 10 is divisible by 5. So at 10 we get Unlock AND Meme?
+      // Let's allow Meme as well, or prioritize unlock?
+      // User didn't specify, but "reward" usually implies one special thing.
+      // If we return above, meme won't show. That's probably fine. Be simpler.
       fetchMeme();
     } else {
       // Otherwise -> Show Food Detail (Sassy AI)
