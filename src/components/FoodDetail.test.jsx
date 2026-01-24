@@ -9,7 +9,15 @@ vi.mock('../lib/db', () => ({
 }));
 
 vi.mock('../stores/appStore', () => ({
-    useAppStore: () => ({ setError: vi.fn() }),
+    useAppStore: () => ({
+        setError: vi.fn(),
+        dailyGoals: {
+            calories: 2000,
+            protein: 150,
+            carbs: 250,
+            fat: 65
+        }
+    }),
 }));
 
 describe('FoodDetail', () => {
@@ -37,16 +45,17 @@ describe('FoodDetail', () => {
         // New features
         expect(screen.getByText('High Protein')).toBeInTheDocument();
         expect(screen.getByText('Cheat Meal')).toBeInTheDocument();
-        expect(screen.getByText(/detail.insightTitle/i)).toBeInTheDocument();
+        expect(screen.getByText('Cheat Meal')).toBeInTheDocument();
+        // expect(screen.getByText(/detail.insightTitle/i)).toBeInTheDocument(); // Removed in redesign
         expect(screen.getByText('Enjoy the gains, buddy!')).toBeInTheDocument();
     });
 
-    it('calls onClose when OK button is clicked', () => {
+    it('calls onClose when Close button is clicked', () => {
         const handleClose = vi.fn();
         render(<FoodDetail entry={mockEntry} onClose={handleClose} />);
 
-        const okButton = screen.getByRole('button', { name: /detail.ok/i });
-        fireEvent.click(okButton);
+        const closeButton = screen.getByRole('button', { name: /close/i });
+        fireEvent.click(closeButton);
 
         expect(handleClose).toHaveBeenCalled();
     });

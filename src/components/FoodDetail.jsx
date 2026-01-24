@@ -47,7 +47,7 @@ export default function FoodDetail({ entry, onClose }) {
                             <div className="w-6 h-6 flex items-center justify-center font-bold text-lg">🍔</div>
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900">Food Details</h2>
+                            <h2 className="text-xl font-bold text-slate-900">{entry.name}</h2>
                         </div>
                     </div>
                 </div>
@@ -102,6 +102,20 @@ export default function FoodDetail({ entry, onClose }) {
                     </p>
                 </div>
 
+                {/* Tags */}
+                {entry.tags && entry.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-6">
+                        {entry.tags.map(tag => (
+                            <span
+                                key={tag}
+                                className="px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-medium border border-slate-200"
+                            >
+                                {tag}
+                            </span>
+                        ))}
+                    </div>
+                )}
+
                 {/* Portion Info if available */}
                 {entry.portion && (
                     <div className="mb-6 p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -124,6 +138,7 @@ export default function FoodDetail({ entry, onClose }) {
                         <button
                             onClick={handleDelete}
                             className="flex items-center gap-1 hover:text-red-500 transition-colors"
+                            aria-label="Delete Entry"
                         >
                             <Trash2 size={16} /> Delete
                         </button>
@@ -134,6 +149,7 @@ export default function FoodDetail({ entry, onClose }) {
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+                    aria-label="Close"
                 >
                     <X size={20} />
                 </button>

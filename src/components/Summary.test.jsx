@@ -37,18 +37,20 @@ describe('Summary Component', () => {
     });
 
     it('displays the Flame icon via lucide-react', () => {
-        // We can't see the icon visually but we can check if it rendered.
-        // Lucide icons usually render an SVG. We can check for a container with the specific styling we added.
         const { container } = render(<Summary entries={mockEntries} />);
-        // logic: <div className="p-3 bg-orange-500/10 ... rounded-full animate-pulse">
-        const flameContainer = container.querySelector('.bg-orange-500\\/10.animate-pulse');
-        expect(flameContainer).toBeInTheDocument();
+        // Look for the Flame icon by its class text-orange-500
+        const flameIcon = container.querySelector('.text-orange-500');
+        expect(flameIcon).toBeInTheDocument();
     });
 
     it('shows macro progress bars', () => {
         render(<Summary entries={mockEntries} />);
-        // Protein total = 50
-        // "50/150g"
-        expect(screen.getByText('50/150g')).toBeInTheDocument();
+        // Protein total = 50, Goal = 150
+        // New structure splits them: <span>50</span><span>/150</span>
+        expect(screen.getByText('50')).toBeInTheDocument();
+        expect(screen.getByText('/150')).toBeInTheDocument();
+
+        // Check label
+        expect(screen.getByText('detail.protein (g)')).toBeInTheDocument();
     });
 });
