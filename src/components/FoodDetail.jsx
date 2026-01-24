@@ -96,10 +96,26 @@ export default function FoodDetail({ entry, onClose }) {
                 </div>
 
                 {/* Description */}
-                <div className="mb-6">
+                <div className="mb-6 space-y-4">
+                    {/* Description */}
                     <p className="text-slate-600 text-sm leading-relaxed">
-                        {entry.description || entry.healthTip || "No description available for this item."}
+                        {entry.description || "No description available."}
                     </p>
+
+                    {/* Collapsible Joke/Tip */}
+                    {entry.healthTip && (
+                        <details className="group">
+                            <summary className="list-none cursor-pointer text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 hover:text-slate-600 transition-colors">
+                                <span>🤖 {t('detail.insightTitle')}</span>
+                                <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 group-open:hidden">Tap to reveal</span>
+                            </summary>
+                            <div className="mt-2 p-3 bg-indigo-50 rounded-xl border border-indigo-100 animate-slide-up">
+                                <p className="text-slate-700 text-sm italic">
+                                    "{entry.healthTip}"
+                                </p>
+                            </div>
+                        </details>
+                    )}
                 </div>
 
                 {/* Tags */}
@@ -125,24 +141,27 @@ export default function FoodDetail({ entry, onClose }) {
                 )}
 
                 {/* Footer / Actions */}
-                <div className="flex items-center justify-between text-slate-400 text-sm pt-2">
-                    <div className="flex items-center gap-1">
-                        <Clock size={14} />
-                        <span>{formatTime(entry.timestamp || entry.date)}</span>
-                    </div>
-                    <div className="flex gap-4">
-                        {/* Edit placeholder */}
-                        {/* <button className="flex items-center gap-1 hover:text-slate-600">
-                            <Edit size={16} /> Edit
-                        </button> */}
-                        <button
-                            onClick={handleDelete}
-                            className="flex items-center gap-1 hover:text-red-500 transition-colors"
-                            aria-label="Delete Entry"
-                        >
-                            <Trash2 size={16} /> Delete
-                        </button>
-                    </div>
+                {/* Footer / Actions */}
+                <div className="flex gap-3 pt-2">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-emerald-500/20"
+                    >
+                        {t('detail.ok')}
+                    </button>
+                    <button
+                        onClick={handleDelete}
+                        className="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 active:scale-[0.98] transition-all"
+                        aria-label="Delete Entry"
+                    >
+                        <Trash2 size={24} />
+                    </button>
+                </div>
+
+                {/* Timestamp below */}
+                <div className="flex items-center justify-center gap-1 text-slate-400 text-sm mt-4">
+                    <Clock size={14} />
+                    <span>{formatTime(entry.timestamp || entry.date)}</span>
                 </div>
 
                 {/* Close Button X absolute */}

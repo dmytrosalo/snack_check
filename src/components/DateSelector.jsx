@@ -75,14 +75,14 @@ export default function DateSelector({ selectedDate, onSelectDate }) {
                             className={`
                   flex flex-col items-center justify-center w-14 h-16 rounded-2xl transition-all duration-300
                   ${selected
-                                    ? 'bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                                    : 'bg-slate-800/50 border border-slate-700/50 text-slate-400 hover:bg-slate-700/50'}
+                                    ? 'bg-emerald-500/10 border border-emerald-500 text-emerald-600 shadow-lg shadow-emerald-500/10'
+                                    : 'bg-white border border-slate-100 text-slate-400 hover:bg-slate-50 shadow-sm'}
                 `}
                         >
                             <div className="text-xs font-medium uppercase tracking-wider mb-1 opacity-80">
                                 {dayName}
                             </div>
-                            <div className={`text-xl font-bold ${selected ? 'text-emerald-300' : 'text-slate-200'}`}>
+                            <div className={`text-xl font-bold ${selected ? 'text-emerald-600' : 'text-slate-800'}`}>
                                 {dayNum}
                             </div>
                         </button>

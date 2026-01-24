@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.14] - 2026-01-24
+### Light Mode & Usability Updates ☀️
+- **Light Theme**: Switched the entire application to a crisp, modern light theme inspired by premium journal apps.
+- **Enhanced Food Detail**:
+    - Restored the "OK" button for quick confirmation.
+    - Implemented a "Smart Reveal" system for AI health tips/jokes—hidden by default to keep the interface clean.
+- **Visual Refinement**: Updated all widgets (Summary, Date Selector, Logs) to use white cards with subtle shadows (`shadow-sm`) for better depth and readability.
+
 ## [0.0.13] - 2026-01-24
 ### UI Overhaul & Reference Design 💅
 - **Date Selector**: Replaced simple arrows with a horizontal scrollable "Day/Date" list for better navigation.

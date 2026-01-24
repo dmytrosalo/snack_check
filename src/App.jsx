@@ -178,22 +178,22 @@ function App() {
 
   return (
     <div
-      className="min-h-[100dvh] bg-gradient-to-b from-slate-900 to-slate-800 text-white"
+      className="min-h-[100dvh] bg-slate-50 text-slate-900"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-lg border-b border-slate-800/50 safe-top">
+      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-slate-200 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
-          <h1 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-sm">
+          <h1 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-500 drop-shadow-sm">
             {t('app.title')}
           </h1>
           <button
             onClick={() => setShowSettings(true)}
-            className="p-2 bg-slate-800/50 rounded-full hover:bg-slate-700/50 transition-colors"
+            className="p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
           >
-            <SettingsIcon size={22} className="text-slate-400" />
+            <SettingsIcon size={22} className="text-slate-600" />
           </button>
         </div>
       </header>
@@ -211,7 +211,7 @@ function App() {
       )}
 
       {/* Date Navigation */}
-      <div className="py-2 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+      <div className="py-2 border-b border-slate-200 bg-white/50 backdrop-blur-sm">
         <DateSelector
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}

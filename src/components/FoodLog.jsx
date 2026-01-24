@@ -47,7 +47,7 @@ export default function FoodLog({ entries, onItemClick }) {
         <div
           key={entry.id}
           onClick={() => onItemClick && onItemClick(entry)}
-          className="bg-slate-800/50 backdrop-blur-lg rounded-xl p-4 border border-slate-700/50 animate-slide-up cursor-pointer active:scale-[0.98] transition-all hover:bg-slate-800/70"
+          className="bg-white rounded-xl p-4 border border-slate-100 shadow-sm animate-slide-up cursor-pointer active:scale-[0.98] transition-all hover:shadow-md hover:border-slate-200"
           style={{ animationDelay: `${index * 50}ms` }}
         >
           <div className="flex gap-3">
@@ -63,15 +63,15 @@ export default function FoodLog({ entries, onItemClick }) {
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <h4 className="text-white font-medium truncate">{entry.name}</h4>
-                  <div className="flex items-center gap-1 text-slate-500 text-xs mt-0.5">
+                  <h4 className="text-slate-900 font-bold truncate">{entry.name}</h4>
+                  <div className="flex items-center gap-1 text-slate-400 text-xs mt-0.5">
                     <Clock size={12} />
                     <span>{formatTime(entry.timestamp)}</span>
                   </div>
                 </div>
                 <button
                   onClick={(e) => handleDelete(entry.id, e)}
-                  className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors flex-shrink-0"
+                  className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -80,20 +80,20 @@ export default function FoodLog({ entries, onItemClick }) {
               {/* Macros */}
               <div className="flex gap-4 mt-2 text-sm">
                 <div>
-                  <span className="text-white font-semibold">{entry.calories}</span>
-                  <span className="text-slate-500 ml-1">kcal</span>
+                  <span className="text-slate-900 font-bold">{entry.calories}</span>
+                  <span className="text-slate-400 ml-1">kcal</span>
                 </div>
                 <div>
-                  <span className="text-blue-400">{entry.protein}g</span>
-                  <span className="text-slate-500 ml-1">P</span>
+                  <span className="text-indigo-600 font-medium">{entry.protein}g</span>
+                  <span className="text-slate-400 ml-1">P</span>
                 </div>
                 <div>
-                  <span className="text-amber-400">{entry.carbs}g</span>
-                  <span className="text-slate-500 ml-1">C</span>
+                  <span className="text-amber-500 font-medium">{entry.carbs}g</span>
+                  <span className="text-slate-400 ml-1">C</span>
                 </div>
                 <div>
-                  <span className="text-pink-400">{entry.fat}g</span>
-                  <span className="text-slate-500 ml-1">F</span>
+                  <span className="text-pink-500 font-medium">{entry.fat}g</span>
+                  <span className="text-slate-400 ml-1">F</span>
                 </div>
               </div>
             </div>

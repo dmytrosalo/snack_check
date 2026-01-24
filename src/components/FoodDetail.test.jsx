@@ -43,11 +43,23 @@ describe('FoodDetail', () => {
         expect(screen.getByText('1 large burger')).toBeInTheDocument(); // portion
 
         // New features
+        // New features
         expect(screen.getByText('High Protein')).toBeInTheDocument();
         expect(screen.getByText('Cheat Meal')).toBeInTheDocument();
-        expect(screen.getByText('Cheat Meal')).toBeInTheDocument();
-        // expect(screen.getByText(/detail.insightTitle/i)).toBeInTheDocument(); // Removed in redesign
-        expect(screen.getByText('Enjoy the gains, buddy!')).toBeInTheDocument();
+        // Joke is now in a details/summary block with quotes
+        expect(screen.getByText(/"Enjoy the gains, buddy!"/)).toBeInTheDocument();
+        // Check for the toggle label
+        expect(screen.getByText(/detail.insightTitle/i)).toBeInTheDocument();
+    });
+
+    it('calls onClose when OK button is clicked', () => {
+        const handleClose = vi.fn();
+        render(<FoodDetail entry={mockEntry} onClose={handleClose} />);
+
+        const okButton = screen.getByRole('button', { name: /detail.ok/i });
+        fireEvent.click(okButton);
+
+        expect(handleClose).toHaveBeenCalled();
     });
 
     it('calls onClose when Close button is clicked', () => {
