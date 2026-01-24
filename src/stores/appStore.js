@@ -51,29 +51,6 @@ export const useAppStore = create(
       // Selected date for history view
       selectedDate: new Date().toISOString().split('T')[0],
       setSelectedDate: (date) => set({ selectedDate: date }),
-
-      // Avatar System
-      unlockedItems: [1], // Level 1 item unlocked by default
-      unlockItem: (id) => set((state) => ({
-        unlockedItems: state.unlockedItems.includes(id) ? state.unlockedItems : [...state.unlockedItems, id]
-      })),
-
-      equippedItems: {
-        head: null,
-        face: null,
-        body: 1, // Default T-Shirt
-        bottom: 2, // Default Jeans
-        feet: 3, // Default Sneakers
-        accessory: null
-      },
-      equipItem: (slot, id) => set((state) => ({
-        equippedItems: { ...state.equippedItems, [slot]: id }
-      })),
-
-      itemColors: {}, // { itemId: '#colorHex' }
-      setItemColor: (itemId, color) => set((state) => ({
-        itemColors: { ...state.itemColors, [itemId]: color }
-      })),
     }),
     {
       name: 'calories-tracker-storage-v1',
@@ -82,10 +59,7 @@ export const useAppStore = create(
         apiKey: state.apiKey,
         dailyGoals: state.dailyGoals,
         requestCount: state.requestCount,
-        lifetimeLogs: state.lifetimeLogs,
-        unlockedItems: state.unlockedItems,
-        equippedItems: state.equippedItems,
-        itemColors: state.itemColors
+        lifetimeLogs: state.lifetimeLogs
       })
     }
   )

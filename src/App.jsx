@@ -1,29 +1,25 @@
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar, User } from 'lucide-react';
+import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Trash2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useAppStore } from './stores/appStore';
 import { initGemini } from './lib/gemini';
-import { db } from './lib/db';
-import { formatDate, getRelativeDate } from './lib/dateUtils';
+import { db, addFoodEntry } from './lib/db';
+import { formatDate } from './lib/dateUtils';
 import Summary from './components/Summary';
 import FoodInput from './components/FoodInput';
 import FoodLog from './components/FoodLog';
 import { analyzeFoodFromImage } from './lib/gemini';
-import { addFoodEntry } from './lib/db';
-import Avatar from './components/Avatar';
 
 const Camera = lazy(() => import('./components/Camera'));
 const Settings = lazy(() => import('./components/Settings'));
-const AvatarScreen = lazy(() => import('./components/AvatarScreen'));
 const FoodDetail = lazy(() => import('./components/FoodDetail'));
 const MemeReward = lazy(() => import('./components/MemeReward'));
 
 function App() {
   const { t, i18n } = useTranslation();
   const [selectedEntry, setSelectedEntry] = useState(null);
-  const [showAvatar, setShowAvatar] = useState(false);
   const [currentMeme, setCurrentMeme] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -39,8 +35,7 @@ function App() {
     clearError,
     setError,
     selectedDate,
-    setSelectedDate,
-    equippedItems
+    setSelectedDate
   } = useAppStore();
 
   // Reactive DB query
@@ -62,21 +57,15 @@ function App() {
   useEffect(() => {
     // Initialize Gemini if API key exists or fallback to env var
     const defaultKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (apiKey) {
-      initGemini(apiKey);
-    } else if (defaultKey) {
-      initGemini(defaultKey);
+    if (apiKey || defaultKey) {
+      initGemini(apiKey || defaultKey);
     }
   }, [apiKey]);
 
   const changeDate = (days) => {
-    const newDate = getRelativeDate(selectedDate, days);
-
-    // Prevent going to future
-    if (days > 0 && selectedDate === new Date().toISOString().split('T')[0]) {
-      return;
-    }
-
+    const date = new Date(selectedDate);
+    date.setDate(date.getDate() + days);
+    const newDate = date.toISOString().split('T')[0];
     setSelectedDate(newDate);
   };
 
@@ -94,57 +83,34 @@ function App() {
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    // if (!touchStart || !touchEnd) return; // Removed as per new state
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
 
-    // const distance = touchStart - touchEnd; // Removed as per new state
-    // const isLeftSwipe = distance > minSwipeDistance; // Removed as per new state
-    // const isRightSwipe = distance < -minSwipeDistance; // Removed as per new state
-
-    // if (isLeftSwipe) {
-    //   // Swiping Left -> Next Day (like pages of a book, next page is on right, so you swipe left to bring it in? Or timeline?)
-    //   // Timeline convention: Past is Left, Future is Right.
-    //   // Swipe Left (finger moves Left) -> Moves content Left -> Reveals content on Right (Future)
-    //   changeDate(1);
-    // }
-
-    // if (isRightSwipe) {
-    //   // Swipe Right (finger moves Right) -> Moves content Right -> Reveals content on Left (Past)
-    //   changeDate(-1);
-    // }
-  };
-
-  const handlePostTracking = (entry) => {
-    const { lifetimeLogs, incrementLifetimeLogs, unlockItem, unlockedItems } = useAppStore.getState();
-    const count = lifetimeLogs + 1;
-    incrementLifetimeLogs();
-
-    // Reward Logic: Unlock new item every 10 logs
-    if (count % 10 === 0) {
-      // Calculate which item ID to unlock based on the count (e.g. 10 -> ID 2, 20 -> ID 3)
-      // Assuming ID 1 is default.
-      const level = Math.floor(count / 10) + 1;
-
-      // Find if this item ID exists in our items list (we need to import ITEMS or just try to unlock)
-      // Since we don't have ITEMS imported here, we'll blindly try to unlock 'level'.
-      // Better yet, let's just use the level as the ID.
-      if (!unlockedItems.includes(level)) {
-        unlockItem(level);
-        // Show toast instead of redirecting
-        setError(`🎉 New Style Unlocked! (Level ${level})`);
-        // setShowAvatar(true); // User requested NO redirect
-        return;
+    if (isLeftSwipe) {
+      // Future (Right)
+      const today = new Date().toISOString().split('T')[0];
+      if (selectedDate !== today) {
+        changeDate(1);
       }
     }
 
+    if (isRightSwipe) {
+      // Past (Left)
+      changeDate(-1);
+    }
+  };
+
+  const handlePostTracking = (entry) => {
+    const { lifetimeLogs, incrementLifetimeLogs } = useAppStore.getState();
+    const count = lifetimeLogs + 1;
+    incrementLifetimeLogs();
+
+    // Reward Logic: Only Memes now
     if (count % 5 === 0) {
-      // Every 5th log -> Show Meme (unless it was a 10th log which also triggers unlock?
-      // 10 is divisible by 5. So at 10 we get Unlock AND Meme?
-      // Let's allow Meme as well, or prioritize unlock?
-      // User didn't specify, but "reward" usually implies one special thing.
-      // If we return above, meme won't show. That's probably fine. Be simpler.
       fetchMeme();
     } else {
-      // Otherwise -> Show Food Detail (Sassy AI)
+      // Otherwise -> Show Food Detail
       setSelectedEntry(entry);
     }
   };
@@ -165,7 +131,8 @@ function App() {
   // Handle camera capture
   const handleCameraCapture = async (imageDataUrl) => {
     // Check limit if using default key
-    if (!apiKey) {
+    const defaultKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey && !defaultKey) {
       const { requestCount } = useAppStore.getState();
       if (requestCount >= 30) {
         setShowCamera(false);
@@ -186,10 +153,11 @@ function App() {
         date: selectedDate
       };
 
+      // Save directly from here (since Camera doesn't use FoodInput directly for add)
       await addFoodEntry(entry);
 
       // Increment count only if using default key
-      if (!apiKey) {
+      if (!apiKey && !defaultKey) {
         useAppStore.getState().incrementRequestCount();
       }
 
@@ -220,23 +188,12 @@ function App() {
           <h1 className="text-3xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 drop-shadow-sm">
             {t('app.title')}
           </h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowAvatar(true)}
-              className="relative p-0.5 bg-emerald-500/10 rounded-full hover:bg-emerald-500/20 transition-colors border border-emerald-500/20 w-10 h-10 overflow-hidden"
-              aria-label={t('avatar.title')}
-            >
-              <div className="absolute top-1 left-1/2 -translate-x-1/2 transform scale-[0.18] origin-top">
-                <Avatar equipped={equippedItems} />
-              </div>
-            </button>
-            <button
-              onClick={() => setShowSettings(true)}
-              className="p-2 bg-slate-800/50 rounded-full hover:bg-slate-700/50 transition-colors"
-            >
-              <SettingsIcon size={22} className="text-slate-400" />
-            </button>
-          </div>
+          <button
+            onClick={() => setShowSettings(true)}
+            className="p-2 bg-slate-800/50 rounded-full hover:bg-slate-700/50 transition-colors"
+          >
+            <SettingsIcon size={22} className="text-slate-400" />
+          </button>
         </div>
       </header>
 
@@ -316,13 +273,6 @@ function App() {
       {showSettings && (
         <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
           <Settings onClose={() => setShowSettings(false)} />
-        </Suspense>
-      )}
-
-      {/* Avatar Modal */}
-      {showAvatar && (
-        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
-          <AvatarScreen onClose={() => setShowAvatar(false)} />
         </Suspense>
       )}
 
