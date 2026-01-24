@@ -11,6 +11,7 @@ import Summary from './components/Summary';
 import FoodInput from './components/FoodInput';
 import FoodLog from './components/FoodLog';
 import { analyzeFoodFromImage } from './lib/gemini';
+import DateSelector from './components/DateSelector';
 
 const Camera = lazy(() => import('./components/Camera'));
 const Settings = lazy(() => import('./components/Settings'));
@@ -210,24 +211,11 @@ function App() {
       )}
 
       {/* Date Navigation */}
-      <div className="flex items-center justify-between px-6 py-2 bg-slate-800/50 backdrop-blur-sm border-b border-slate-700/50">
-        <button
-          onClick={() => changeDate(-1)}
-          className="p-1 text-slate-400 hover:text-white transition-colors"
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <div className="flex items-center gap-2 font-medium">
-          <Calendar size={16} className="text-emerald-400" />
-          <span>{formatDate(selectedDate, language)}</span>
-        </div>
-        <button
-          onClick={() => changeDate(1)}
-          className="p-1 text-slate-400 hover:text-white transition-colors"
-          disabled={selectedDate === new Date().toISOString().split('T')[0]}
-        >
-          <ChevronRight size={24} className={selectedDate === new Date().toISOString().split('T')[0] ? 'opacity-30' : ''} />
-        </button>
+      <div className="py-2 border-b border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
+        <DateSelector
+          selectedDate={selectedDate}
+          onSelectDate={setSelectedDate}
+        />
       </div>
 
       {/* Main Content */}

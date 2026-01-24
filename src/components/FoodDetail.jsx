@@ -4,8 +4,8 @@ import { useAppStore } from '../stores/appStore';
 import { useTranslation } from 'react-i18next'; // Import i18n
 
 export default function FoodDetail({ entry, onClose }) {
-    const { setError } = useAppStore();
-    const { t } = useTranslation(); // Init hook
+    const { setError, dailyGoals } = useAppStore();
+    const { t } = useTranslation();
 
     const handleDelete = async () => {
         if (window.confirm(t('detail.confirmDelete'))) {
@@ -21,136 +21,122 @@ export default function FoodDetail({ entry, onClose }) {
     const formatTime = (ts) => {
         if (!ts) return '';
         const d = new Date(ts);
-        // Check if date is valid
         if (isNaN(d.getTime())) return '';
-
-        return d.toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
 
+    // Calculate percentages
+    const getPercent = (val, goal) => Math.round((val / goal) * 100);
+
     return (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm pointer-events-auto transition-opacity"
+                className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                 onClick={onClose}
             />
 
-            {/* Modal/Sheet */}
-            <div className="w-full sm:w-[400px] bg-slate-900 border-t sm:border border-slate-700/50 rounded-t-3xl sm:rounded-3xl p-6 pointer-events-auto animate-slide-up shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            {/* Card */}
+            <div className="w-full max-w-md bg-white text-slate-900 rounded-3xl p-6 relative z-10 animate-slide-up shadow-2xl">
 
-                {/* Drag handle for mobile feel */}
-                <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-6" />
-
+                {/* Header */}
                 <div className="flex items-start justify-between mb-6">
-                    <div className="flex-1 mr-4">
-                        <h2 className="text-2xl font-bold text-white leading-tight">{entry.name}</h2>
-                        <div className="flex items-center gap-2 text-slate-400 text-sm mt-1">
-                            <Clock size={14} />
-                            <span>{formatTime(entry.timestamp || entry.date) || 'Recent'}</span>
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
+                            {/* Icon placeholder - could be 'Journable' logo or generic food icon */}
+                            <div className="w-6 h-6 flex items-center justify-center font-bold text-lg">🍔</div>
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-900">Food Details</h2>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 bg-slate-800 rounded-full text-slate-400 hover:text-white"
-                    >
-                        <X size={20} />
-                    </button>
                 </div>
 
-                {/* Large Image */}
-                {entry.imageUrl && (
-                    <div className="mb-6 rounded-2xl overflow-hidden shadow-lg border border-slate-700/50">
-                        <img
-                            src={entry.imageUrl}
-                            alt={entry.name}
-                            className="w-full h-64 object-cover"
-                        />
+                {/* Main Stats */}
+                <div className="grid grid-cols-4 gap-4 mb-6 text-center border-b border-slate-100 pb-6">
+                    <div>
+                        <div className="font-bold text-xl text-slate-900">{entry.calories}</div>
+                        <div className="text-xs text-slate-500 font-medium">Calories</div>
+                    </div>
+                    <div>
+                        <div className="font-bold text-xl text-slate-900">{entry.carbs}g</div>
+                        <div className="text-xs text-slate-500 font-medium">Carbs</div>
+                    </div>
+                    <div>
+                        <div className="font-bold text-xl text-slate-900">{entry.protein}g</div>
+                        <div className="text-xs text-slate-500 font-medium">Protein</div>
+                    </div>
+                    <div>
+                        <div className="font-bold text-xl text-slate-900">{entry.fat}g</div>
+                        <div className="text-xs text-slate-500 font-medium">Fat</div>
+                    </div>
+                </div>
+
+                {/* Percentages */}
+                <div className="mb-6 border-b border-slate-100 pb-6">
+                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Percentage of Daily Goals</h3>
+                    <div className="grid grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div className="font-bold text-lg text-slate-900">{getPercent(entry.calories, dailyGoals.calories)}%</div>
+                            <div className="text-xs text-slate-500">Calories</div>
+                        </div>
+                        <div>
+                            <div className="font-bold text-lg text-slate-900">{getPercent(entry.carbs, dailyGoals.carbs)}%</div>
+                            <div className="text-xs text-slate-500">Carbs</div>
+                        </div>
+                        <div>
+                            <div className="font-bold text-lg text-slate-900">{getPercent(entry.protein, dailyGoals.protein)}%</div>
+                            <div className="text-xs text-slate-500">Protein</div>
+                        </div>
+                        <div>
+                            <div className="font-bold text-lg text-slate-900">{getPercent(entry.fat, dailyGoals.fat)}%</div>
+                            <div className="text-xs text-slate-500">Fat</div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Description */}
+                <div className="mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                        {entry.description || entry.healthTip || "No description available for this item."}
+                    </p>
+                </div>
+
+                {/* Portion Info if available */}
+                {entry.portion && (
+                    <div className="mb-6 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <span className="text-xs font-bold text-slate-400 uppercase mr-2">Portion:</span>
+                        <span className="text-sm text-slate-700">{entry.portion}</span>
                     </div>
                 )}
 
-                {/* Tags */}
-                {entry.tags && entry.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-6">
-                        {entry.tags.map(tag => (
-                            <span
-                                key={tag}
-                                className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 text-xs font-medium border border-emerald-500/20"
-                            >
-                                {tag}
-                            </span>
-                        ))}
+                {/* Footer / Actions */}
+                <div className="flex items-center justify-between text-slate-400 text-sm pt-2">
+                    <div className="flex items-center gap-1">
+                        <Clock size={14} />
+                        <span>{formatTime(entry.timestamp || entry.date)}</span>
                     </div>
-                )}
-
-                {/* Macros Grid */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-                        <div className="flex items-center gap-2 text-slate-400 text-sm mb-1">
-                            <Flame size={16} className="text-orange-500" />
-                            <span>{t('detail.calories')}</span>
-                        </div>
-                        <div className="text-2xl font-bold text-white">
-                            {entry.calories} <span className="text-sm font-normal text-slate-500">kcal</span>
-                        </div>
-                    </div>
-
-                    <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 space-y-3">
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-blue-400 font-medium">{t('detail.protein')}</span>
-                            <span className="text-white font-bold">{entry.protein}g</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-amber-400 font-medium">{t('detail.carbs')}</span>
-                            <span className="text-white font-bold">{entry.carbs}g</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-pink-400 font-medium">{t('detail.fat')}</span>
-                            <span className="text-white font-bold">{entry.fat}g</span>
-                        </div>
+                    <div className="flex gap-4">
+                        {/* Edit placeholder */}
+                        {/* <button className="flex items-center gap-1 hover:text-slate-600">
+                            <Edit size={16} /> Edit
+                        </button> */}
+                        <button
+                            onClick={handleDelete}
+                            className="flex items-center gap-1 hover:text-red-500 transition-colors"
+                        >
+                            <Trash2 size={16} /> Delete
+                        </button>
                     </div>
                 </div>
 
-                {/* Health Tip / Info */}
-                <div className="space-y-4 mb-8">
-                    {entry.healthTip && (
-                        <div className="bg-indigo-500/10 p-4 rounded-xl border border-indigo-500/20">
-                            <h4 className="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">{t('detail.insightTitle')}</h4>
-                            <p className="text-slate-200 text-sm">{entry.healthTip}</p>
-                        </div>
-                    )}
-
-                    <div className="bg-slate-800/30 p-4 rounded-xl border border-slate-700/30">
-                        <div className="flex items-start gap-3">
-                            <Info size={18} className="text-slate-400 mt-0.5" />
-                            <div>
-                                <p className="text-slate-300 text-sm leading-relaxed">
-                                    <span className="text-slate-500 block text-xs uppercase tracking-wider mb-1">{t('detail.portion')}</span>
-                                    {entry.portion || 'No portion information available.'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3">
-                    <button
-                        onClick={onClose}
-                        className="flex-1 py-4 bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-emerald-500/20"
-                    >
-                        {t('detail.ok')}
-                    </button>
-                    <button
-                        onClick={handleDelete}
-                        className="p-4 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 active:scale-[0.98] transition-all"
-                        aria-label="Delete Entry"
-                    >
-                        <Trash2 size={24} />
-                    </button>
-                </div>
+                {/* Close Button X absolute */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+                >
+                    <X size={20} />
+                </button>
             </div>
         </div>
     );

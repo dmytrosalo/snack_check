@@ -89,61 +89,91 @@ export default function Summary({ entries }) {
   const remaining = dailyGoals.calories - totals.calories;
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-5 border border-slate-700/50">
-      {/* Main Calories Display */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-slate-400 text-sm mb-1">{t('summary.title')}</h2>
-          <div className="flex items-baseline gap-2">
-            <span className="text-4xl font-bold text-white">
-              {Math.round(totals.calories)}
-            </span>
-            <span className="text-slate-500">/ {dailyGoals.calories}</span>
-          </div>
-          <p className={`text-sm mt-1 ${remaining >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-            {remaining >= 0
-              ? `${Math.round(remaining)} ${t('summary.remaining')}`
-              : `${Math.abs(Math.round(remaining))} ${t('summary.over')}`
-            }
-          </p>
+    <div className="grid grid-cols-1 gap-4">
+      {/* Calories Card */}
+      <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-5 border border-slate-700/50">
+        <div className="flex items-center gap-2 mb-4">
+          <Flame className="text-orange-500 fill-orange-500/20" size={20} />
+          <h2 className="font-bold text-white text-lg">{t('summary.title')}</h2>
         </div>
 
-        {/* Flame Icon */}
-        <div className="flex-1 flex justify-center px-4">
-          <div className="p-3 bg-orange-500/10 rounded-full animate-pulse border border-orange-500/20 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
-            <Flame size={28} className="text-orange-500 fill-orange-500/50" />
+        <div className="flex justify-between items-end mb-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white mb-1">{Math.round(totals.calories)}</div>
+            <div className="text-slate-400 text-xs font-medium">Food</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-slate-500 mb-1">0</div>
+            <div className="text-slate-500 text-xs font-medium">Exercise</div>
+          </div>
+          <div className="text-center">
+            <div className={`text-2xl font-bold mb-1 ${remaining >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+              {Math.round(remaining)}
+            </div>
+            <div className="text-slate-400 text-xs font-medium">Remaining</div>
           </div>
         </div>
-
-        <CircularProgress
-          value={totals.calories}
-          max={dailyGoals.calories}
-          color={totals.calories > dailyGoals.calories ? '#ef4444' : '#10b981'}
-          size={90}
-          strokeWidth={10}
-        />
       </div>
 
-      {/* Macros */}
-      <div className="space-y-3">
-        <MacroBar
-          label={t('detail.protein')}
-          value={totals.protein}
-          max={dailyGoals.protein}
-          color="#3b82f6"
-        />
-        <MacroBar
-          label={t('detail.carbs')}
-          value={totals.carbs}
-          max={dailyGoals.carbs}
-          color="#f59e0b"
-        />
-        <MacroBar
-          label={t('detail.fat')}
-          value={totals.fat}
-          max={dailyGoals.fat}
-          color="#ec4899"
-        />
+      {/* Macros Card */}
+      <div className="bg-slate-800/50 backdrop-blur-lg rounded-2xl p-5 border border-slate-700/50">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-5 h-5 rounded-full border-2 border-pink-500 border-t-emerald-400 border-r-blue-400 -rotate-45" />
+          <h2 className="font-bold text-white text-lg">Macros</h2>
+        </div>
+
+        <div className="space-y-4">
+          {/* Carbs */}
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <div className="font-medium text-slate-300">
+                <span className="text-white font-bold">{Math.round(totals.carbs)}</span>
+                <span className="text-slate-500">/{dailyGoals.carbs}</span>
+              </div>
+              <div className="text-slate-400">{t('detail.carbs')} (g)</div>
+            </div>
+            <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-slate-200 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((totals.carbs / dailyGoals.carbs) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Protein */}
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <div className="font-medium text-slate-300">
+                <span className="text-white font-bold">{Math.round(totals.protein)}</span>
+                <span className="text-slate-500">/{dailyGoals.protein}</span>
+              </div>
+              <div className="text-slate-400">{t('detail.protein')} (g)</div>
+            </div>
+            <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-purple-400 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((totals.protein / dailyGoals.protein) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Fat */}
+          <div>
+            <div className="flex justify-between text-sm mb-1">
+              <div className="font-medium text-slate-300">
+                <span className="text-white font-bold">{Math.round(totals.fat)}</span>
+                <span className="text-slate-500">/{dailyGoals.fat}</span>
+              </div>
+              <div className="text-slate-400">{t('detail.fat')} (g)</div>
+            </div>
+            <div className="h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-400 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min((totals.fat / dailyGoals.fat) * 100, 100)}%` }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

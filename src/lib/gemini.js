@@ -26,7 +26,8 @@ Format:
   "fat": Number (grams),
   "portion": "Estimated Portion Size (in ${language})",
   "tags": ["Tag1", "Tag2"],
-  "healthTip": "A short, sassy comment (in ${language})"
+  "healthTip": "A short, sassy comment (in ${language})",
+  "description": "A detailed, factual description of the food ingredients and preparation (in ${language}). Min 2 sentences."
 }
 
 Instructions:
@@ -35,6 +36,7 @@ Instructions:
 3. If multiple items are present, sum up their values.
 4. Identify dietary tags (e.g., "High Protein", "Vegan", "Keto Friendly", "Gluten Free", "High Sugar"). Translate tags to ${language}.
 5. Provide a short, sassy, and slightly edgy comment in ${language}. If it's healthy, praise them. If it's junk food, be brutally honest (e.g., "Do you want to be fat?"). Max 1 sentence. If Ukrainian, use culturally relevant humor/slang if appropriate.
+6. Provide a detailed, factual description of what the food is, its likely ingredients, and culinary context.
 
 Return valid JSON only:
 {
@@ -45,7 +47,8 @@ Return valid JSON only:
   "fat": number,
   "portion": "string",
   "tags": ["string"],
-  "healthTip": "string"
+  "healthTip": "string",
+  "description": "string"
 }
 `;
 
@@ -74,6 +77,7 @@ const parseResponse = (text) => {
     portion: parsed.portion || 'Unknown portion',
     tags: Array.isArray(parsed.tags) ? parsed.tags : [],
     healthTip: parsed.healthTip || '',
+    description: parsed.description || '',
   };
 };
 

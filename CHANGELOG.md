@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.0.13] - 2026-01-24
+### UI Overhaul & Reference Design 💅
+- **Date Selector**: Replaced simple arrows with a horizontal scrollable "Day/Date" list for better navigation.
+- **Dashboard Widgets**: Redesigned the top summary into distinct "Calories" and "Macros" cards to match the reference design.
+- **Food Details**: Complete redesign of the detail view to a "Journable" style card.
+- **AI Descriptions**: Added a `description` field to the AI prompt to generate detailed, factual descriptions for logged foods.
+- **Visual Polish**: Updated fonts, styling, and spacing to a more premium, modern aesthetic.
+
 ## [0.0.12] - 2026-01-17
 ### Testing & Stability 🧪
 - **Avatar System Tests**: Added comprehensive unit tests for `Avatar`, `AvatarScreen`, and `PainterlyFilter` components.
