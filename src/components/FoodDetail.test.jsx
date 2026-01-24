@@ -46,10 +46,10 @@ describe('FoodDetail', () => {
         // New features
         expect(screen.getByText('High Protein')).toBeInTheDocument();
         expect(screen.getByText('Cheat Meal')).toBeInTheDocument();
-        // Joke is now in a details/summary block with quotes
+        // Joke is now visible by default
         expect(screen.getByText(/"Enjoy the gains, buddy!"/)).toBeInTheDocument();
-        // Check for the toggle label
-        expect(screen.getByText(/detail.insightTitle/i)).toBeInTheDocument();
+        // Check for the new toggle label "Product Info"
+        expect(screen.getByText(/Product Info/i)).toBeInTheDocument();
     });
 
     it('calls onClose when OK button is clicked', () => {

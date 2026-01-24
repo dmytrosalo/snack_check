@@ -5,7 +5,7 @@
 - **Light Theme**: Switched the entire application to a crisp, modern light theme inspired by premium journal apps.
 - **Enhanced Food Detail**:
     - Restored the "OK" button for quick confirmation.
-    - Implemented a "Smart Reveal" system for AI health tips/jokes—hidden by default to keep the interface clean.
+    - **Smart Layout**: AI Health Tip is now front-and-center for immediate engagement, while detailed product info is tucked away in a collapsible section.
 - **Visual Refinement**: Updated all widgets (Summary, Date Selector, Logs) to use white cards with subtle shadows (`shadow-sm`) for better depth and readability.
 
 ## [0.0.13] - 2026-01-24

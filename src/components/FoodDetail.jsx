@@ -97,25 +97,28 @@ export default function FoodDetail({ entry, onClose }) {
 
                 {/* Description */}
                 <div className="mb-6 space-y-4">
-                    {/* Description */}
-                    <p className="text-slate-600 text-sm leading-relaxed">
-                        {entry.description || "No description available."}
-                    </p>
+                    {/* Joke/Tip - Always Visible */}
+                    <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xl">🤖</span>
+                            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{t('detail.insightTitle')}</span>
+                        </div>
+                        <p className="text-slate-700 text-sm italic leading-relaxed">
+                            "{entry.healthTip}"
+                        </p>
+                    </div>
 
-                    {/* Collapsible Joke/Tip */}
-                    {entry.healthTip && (
-                        <details className="group">
-                            <summary className="list-none cursor-pointer text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2 hover:text-slate-600 transition-colors">
-                                <span>🤖 {t('detail.insightTitle')}</span>
-                                <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 group-open:hidden">Tap to reveal</span>
-                            </summary>
-                            <div className="mt-2 p-3 bg-indigo-50 rounded-xl border border-indigo-100 animate-slide-up">
-                                <p className="text-slate-700 text-sm italic">
-                                    "{entry.healthTip}"
-                                </p>
-                            </div>
-                        </details>
-                    )}
+                    {/* Description - Collapsible */}
+                    <details className="group">
+                        <summary className="list-none cursor-pointer flex items-center gap-2 text-slate-400 hover:text-slate-600 transition-colors">
+                            <Info size={16} />
+                            <span className="text-xs font-semibold uppercase tracking-wider">Product Info</span>
+                            <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-400 group-open:hidden">Tap to read</span>
+                        </summary>
+                        <div className="mt-3 text-slate-600 text-sm leading-relaxed animate-slide-up pl-1 border-l-2 border-slate-100">
+                            {entry.description || "No detailed description available."}
+                        </div>
+                    </details>
                 </div>
 
                 {/* Tags */}
