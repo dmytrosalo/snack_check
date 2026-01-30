@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { deleteFoodEntry } from '../lib/db';
 import { useAppStore } from '../stores/appStore';
 
-export default function FoodLog({ entries, onItemClick }) {
+export default function FoodLog({ entries, onItemClick, onDelete }) {
   const { t } = useTranslation();
   const { setError } = useAppStore();
 
@@ -12,6 +12,7 @@ export default function FoodLog({ entries, onItemClick }) {
     if (window.confirm(t('detail.confirmDelete'))) {
       try {
         await deleteFoodEntry(id);
+        if (onDelete) onDelete();
       } catch (err) {
         setError(t('errors.failedToDelete'));
       }

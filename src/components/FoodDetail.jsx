@@ -3,7 +3,7 @@ import { deleteFoodEntry } from '../lib/db';
 import { useAppStore } from '../stores/appStore';
 import { useTranslation } from 'react-i18next'; // Import i18n
 
-export default function FoodDetail({ entry, onClose }) {
+export default function FoodDetail({ entry, onClose, onDelete }) {
     const { setError, dailyGoals } = useAppStore();
     const { t } = useTranslation();
 
@@ -11,6 +11,7 @@ export default function FoodDetail({ entry, onClose }) {
         if (window.confirm(t('detail.confirmDelete'))) {
             try {
                 await deleteFoodEntry(entry.id);
+                if (onDelete) onDelete();
                 onClose();
             } catch (err) {
                 setError(t('errors.failedToDelete'));
@@ -40,16 +41,24 @@ export default function FoodDetail({ entry, onClose }) {
             <div className="w-full max-w-md bg-white text-slate-900 rounded-3xl p-6 relative z-10 animate-slide-up shadow-2xl">
 
                 {/* Header */}
-                <div className="flex items-start justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-100 rounded-xl text-blue-600">
-                            {/* Icon placeholder - could be 'Journable' logo or generic food icon */}
-                            <div className="w-6 h-6 flex items-center justify-center font-bold text-lg">🍔</div>
+                {/* Header with Image */}
+                <div className="flex flex-col items-center mb-6">
+                    {entry.imageUrl ? (
+                        <div className="w-full h-48 mb-4 relative rounded-2xl overflow-hidden shadow-md">
+                            <img
+                                src={entry.imageUrl}
+                                alt={entry.name}
+                                className="w-full h-full object-cover"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                         </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-slate-900">{entry.name}</h2>
+                    ) : (
+                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center font-bold text-3xl mb-3 text-blue-600">
+                            🍔
                         </div>
-                    </div>
+                    )}
+
+                    <h2 className="text-2xl font-bold text-slate-900 text-center">{entry.name}</h2>
                 </div>
 
                 {/* Main Stats */}

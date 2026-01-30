@@ -2,16 +2,18 @@ import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Settings as SettingsIcon, X, Loader2, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Trash2, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
+
 import { useAppStore } from './stores/appStore';
 import { initGemini } from './lib/gemini';
-import { db, addFoodEntry } from './lib/db';
+import { addFoodEntry, getEntriesByDate } from './lib/db';
 import { formatDate } from './lib/dateUtils';
 import Summary from './components/Summary';
 import FoodInput from './components/FoodInput';
 import FoodLog from './components/FoodLog';
 import { analyzeFoodFromImage } from './lib/gemini';
 import DateSelector from './components/DateSelector';
+import Auth from './components/Auth';
+import { useAuth } from './contexts/AuthContext';
 
 const Camera = lazy(() => import('./components/Camera'));
 const Settings = lazy(() => import('./components/Settings'));
@@ -39,14 +41,30 @@ function App() {
     setSelectedDate
   } = useAppStore();
 
-  // Reactive DB query
-  const entries = useLiveQuery(
-    () => db.foodEntries
-      .where('date')
-      .equals(selectedDate)
-      .sortBy('timestamp'),
-    [selectedDate]
-  ) || [];
+  /* Auth & Data Fetching */
+  const { user, loading: authLoading } = useAuth();
+  const [entries, setEntries] = useState([]);
+  const [loadingEntries, setLoadingEntries] = useState(false);
+
+  // Fetch entries when date or user changes
+  const fetchEntries = useCallback(async () => {
+    if (!user) return;
+    setLoadingEntries(true);
+    try {
+      const data = await getEntriesByDate(selectedDate);
+      setEntries(data || []);
+    } catch (err) {
+      console.error('Failed to load entries:', err);
+    } finally {
+      setLoadingEntries(false);
+    }
+  }, [selectedDate, user]);
+
+  useEffect(() => {
+    fetchEntries();
+  }, [fetchEntries]);
+
+  // Reactive DB query -> Replaced by useEffect above
 
   // Sync language from store to i18n
   useEffect(() => {
@@ -154,8 +172,11 @@ function App() {
         date: selectedDate
       };
 
-      // Save directly from here (since Camera doesn't use FoodInput directly for add)
+      // Save directly
       await addFoodEntry(entry);
+
+      // Refresh entries
+      fetchEntries();
 
       // Increment count only if using default key
       if (!apiKey && !defaultKey) {
@@ -210,78 +231,99 @@ function App() {
         </div>
       )}
 
-      {/* Date Navigation */}
-      <div className="py-2 border-b border-slate-200 bg-white/50 backdrop-blur-sm">
-        <DateSelector
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-        />
-      </div>
+      {/* Loading Screen */}
+      {authLoading && (
+        <div className="fixed inset-0 z-50 bg-white flex items-center justify-center">
+          <Loader2 className="animate-spin text-indigo-600" size={48} />
+        </div>
+      )}
 
-      {/* Main Content */}
-      <main className="px-4 py-4 pb-24 space-y-4 max-w-lg mx-auto">
-        {/* API Key Prompt */}
-        {!apiKey && !import.meta.env.VITE_GEMINI_API_KEY && (
-          <div
-            onClick={() => setShowSettings(true)}
-            className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 cursor-pointer hover:bg-amber-500/20 transition-colors"
-          >
-            <p className="text-amber-400 text-sm">
-              {t('app.welcome')}
-            </p>
+      {/* Auth Screen */}
+      {!authLoading && !user && <Auth />}
+
+      {/* Main App */}
+      {!authLoading && user && (
+        <>
+
+          {/* Date Navigation */}
+          <div className="py-2 border-b border-slate-200 bg-white/50 backdrop-blur-sm">
+            <DateSelector
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
           </div>
-        )}
 
-        <Summary entries={entries} />
+          {/* Main Content */}
+          <main className="px-4 py-4 pb-24 space-y-4 max-w-lg mx-auto">
+            {/* API Key Prompt */}
+            {!apiKey && !import.meta.env.VITE_GEMINI_API_KEY && (
+              <div
+                onClick={() => setShowSettings(true)}
+                className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 cursor-pointer hover:bg-amber-500/20 transition-colors"
+              >
+                <p className="text-amber-400 text-sm">
+                  {t('app.welcome')}
+                </p>
+              </div>
+            )}
 
-        {/* Only allow adding food if selected date is today (optional choice, but let's allow all days for flexibility) */}
-        <FoodInput
-          onShowCamera={() => setShowCamera(true)}
-          selectedDate={selectedDate}
-          onSuccess={handlePostTracking}
-        />
+            <Summary entries={entries} />
 
-        <FoodLog
-          entries={entries}
-          onItemClick={setSelectedEntry}
-        />
-      </main>
+            {/* Only allow adding food if selected date is today (optional choice, but let's allow all days for flexibility) */}
+            <FoodInput
+              onShowCamera={() => setShowCamera(true)}
+              selectedDate={selectedDate}
+              onSuccess={(entry) => {
+                fetchEntries();
+                handlePostTracking(entry);
+              }}
+            />
 
-      {/* Camera Modal */}
-      {showCamera && (
-        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
-          <Camera
-            onCapture={handleCameraCapture}
-            onClose={() => setShowCamera(false)}
-          />
-        </Suspense>
-      )}
+            <FoodLog
+              entries={entries}
+              onItemClick={setSelectedEntry}
+              onDelete={fetchEntries}
+            />
+          </main>
 
-      {/* Settings Modal */}
-      {showSettings && (
-        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
-          <Settings onClose={() => setShowSettings(false)} />
-        </Suspense>
-      )}
+          {/* Camera Modal */}
+          {showCamera && (
+            <Suspense fallback={<div className="fixed inset-0 z-50 bg-black flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
+              <Camera
+                onCapture={handleCameraCapture}
+                onClose={() => setShowCamera(false)}
+              />
+            </Suspense>
+          )}
 
-      {/* Food Detail Modal */}
-      {selectedEntry && (
-        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
-          <FoodDetail
-            entry={selectedEntry}
-            onClose={() => setSelectedEntry(null)}
-          />
-        </Suspense>
-      )}
+          {/* Settings Modal */}
+          {showSettings && (
+            <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
+              <Settings onClose={() => setShowSettings(false)} />
+            </Suspense>
+          )}
 
-      {/* Meme Reward Modal */}
-      {currentMeme && (
-        <Suspense fallback={null}>
-          <MemeReward
-            meme={currentMeme}
-            onClose={() => setCurrentMeme(null)}
-          />
-        </Suspense>
+          {/* Food Detail Modal */}
+          {selectedEntry && (
+            <Suspense fallback={<div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center"><Loader2 className="animate-spin text-white" size={32} /></div>}>
+              <FoodDetail
+                entry={selectedEntry}
+                onClose={() => setSelectedEntry(null)}
+                onDelete={fetchEntries}
+              />
+            </Suspense>
+          )}
+
+          {/* Meme Reward Modal */}
+          {currentMeme && (
+            <Suspense fallback={null}>
+              <MemeReward
+                meme={currentMeme}
+                onClose={() => setCurrentMeme(null)}
+              />
+            </Suspense>
+          )}
+        </>
       )}
     </div>
   );
