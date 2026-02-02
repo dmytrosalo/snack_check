@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Save, Key, Globe, Target } from 'lucide-react';
 import { useAppStore } from '../stores/appStore';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 import { initGemini } from '../lib/gemini';
 
 export default function Settings({ onClose }) {
@@ -9,6 +10,7 @@ export default function Settings({ onClose }) {
   const [keyInput, setKeyInput] = useState(apiKey);
   const [caloriesInput, setCaloriesInput] = useState(dailyGoals.calories);
   const { t, i18n } = useTranslation();
+  const { signOut } = useAuth();
 
   const handleSave = () => {
     setApiKey(keyInput);
@@ -112,6 +114,17 @@ export default function Settings({ onClose }) {
           >
             <Save size={18} />
             {t('settings.save')}
+          </button>
+
+          {/* Logout Button */}
+          <button
+            onClick={async () => {
+              await signOut();
+              onClose();
+            }}
+            className="w-full flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-red-900/40 text-red-400 font-semibold rounded-xl transition-colors border border-slate-700"
+          >
+            Log Out
           </button>
         </div>
       </div>

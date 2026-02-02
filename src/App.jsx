@@ -41,8 +41,8 @@ function App() {
     setSelectedDate
   } = useAppStore();
 
-  /* Auth & Data Fetching */
   const { user, loading: authLoading } = useAuth();
+
   const [entries, setEntries] = useState([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
 

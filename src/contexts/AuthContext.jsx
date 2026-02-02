@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
         });
 
         // Listen for changes on auth state (logged in, signed out, etc.)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             setUser(session?.user ?? null);
             setLoading(false);
         });
@@ -29,7 +29,20 @@ export function AuthProvider({ children }) {
         signUp: (data) => supabase.auth.signUp(data),
         signIn: (data) => supabase.auth.signInWithPassword(data),
         signInWithOAuth: (provider) => supabase.auth.signInWithOAuth({ provider }),
-        signOut: () => supabase.auth.signOut(),
+        signOut: async () => {
+            try {
+                // Clear state immediately to give feedback
+                setUser(null);
+
+                const { error } = await supabase.auth.signOut();
+                if (error) console.error('Error signing out:', error);
+            } catch (e) {
+                console.error('Exception signing out:', e);
+            } finally {
+                setUser(null);
+                localStorage.clear(); // Force clear just in case
+            }
+        },
         user,
         loading
     };

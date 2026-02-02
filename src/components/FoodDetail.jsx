@@ -38,7 +38,7 @@ export default function FoodDetail({ entry, onClose, onDelete }) {
             />
 
             {/* Card */}
-            <div className="w-full max-w-md bg-white text-slate-900 rounded-3xl p-6 relative z-10 animate-slide-up shadow-2xl">
+            <div className="w-full max-w-md bg-white text-slate-900 rounded-3xl p-6 relative z-10 animate-slide-up shadow-2xl max-h-[90vh] overflow-y-auto">
 
                 {/* Header */}
                 {/* Header with Image */}
